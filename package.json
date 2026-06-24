@@ -1,0 +1,24 @@
+{
+  "name": "soft-tennis-rule-drill",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ソフトテニスのルール、審判コール、公式用語を4択で学ぶスマホ向けPWA。",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --check sources.js && node --check questions.js && node --check app.js && node --check sw.js && node tests/data.test.js"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omicreate/soft-tennis-rule-drill.git"
+  },
+  "author": "omicreate",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/omicreate/soft-tennis-rule-drill/issues"
+  },
+  "homepage": "https://omicreate.github.io/soft-tennis-rule-drill/"
+}

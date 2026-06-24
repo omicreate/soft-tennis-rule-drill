@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f9f62" />
+    <meta name="color-scheme" content="light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ルールドリル" />
+    <meta
+      name="description"
+      content="小学生・中学生向けに、ソフトテニスの審判コール、ルール、2026年コイントス運用、ヒートルールを4択で学べるスマホ向けPWA。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ソフテニルールドリル" />
+    <meta property="og:title" content="ソフテニルールドリル" />
+    <meta
+      property="og:description"
+      content="ソフトテニスのルール、審判コール、公式用語を4択で学べるスマホ向けPWA。"
+    />
+    <meta property="og:url" content="https://omicreate.github.io/soft-tennis-rule-drill/" />
+    <meta property="og:image" content="https://omicreate.github.io/soft-tennis-rule-drill/assets/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ソフテニルールドリル" />
+    <meta
+      name="twitter:description"
+      content="ソフトテニスのルール、審判コール、公式用語を4択で学べるスマホ向けPWA。"
+    />
+    <meta name="twitter:image" content="https://omicreate.github.io/soft-tennis-rule-drill/assets/og-image.png" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'"
+    />
+    <title>ソフテニルールドリル</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="icon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="brand-mark" aria-hidden="true">
+          <span class="plain-ball"></span>
+          <span class="racket-stem"></span>
+        </div>
+        <div>
+          <p class="source-line">公式資料・連盟資料を確認して作成</p>
+          <h1>ソフテニルールドリル</h1>
+        </div>
+      </header>
+
+      <section class="status-strip" aria-label="学習状況">
+        <div>
+          <span class="status-label">正解</span>
+          <strong id="correctValue" class="stat-correct">0</strong>
+        </div>
+        <div>
+          <span class="status-label">不正解</span>
+          <strong id="wrongValue" class="stat-wrong">0</strong>
+        </div>
+        <div>
+          <span class="status-label">満点</span>
+          <strong id="perfectValue" class="stat-perfect">0</strong>
+        </div>
+      </section>
+
+      <section id="viewRoot" class="view-root" aria-live="polite"></section>
+
+      <nav class="bottom-nav" aria-label="表示切替">
+        <button class="nav-button" data-tab="learn" type="button">
+          <span class="nav-icon book-icon" aria-hidden="true"></span>
+          <span>学ぶ</span>
+        </button>
+        <button class="nav-button active" data-tab="quiz" type="button">
+          <span class="nav-icon quiz-icon" aria-hidden="true"></span>
+          <span>クイズ</span>
+        </button>
+        <button class="nav-button" data-tab="exam" type="button">
+          <span class="nav-icon board-icon" aria-hidden="true"></span>
+          <span>試験</span>
+        </button>
+        <button class="nav-button" data-tab="record" type="button">
+          <span class="nav-icon bars-icon" aria-hidden="true"></span>
+          <span>記録</span>
+        </button>
+      </nav>
+    </main>
+
+    <script src="sources.js"></script>
+    <script src="questions.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
