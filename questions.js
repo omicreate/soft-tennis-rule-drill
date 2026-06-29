@@ -21,6 +21,11 @@
     "ヒートルール": ["jsta-heat-rule"]
   };
 
+  const reviewedCategoryLimits = {
+    "2026年コイントス運用": 3,
+    "ヒートルール": 3
+  };
+
   const baseQuestions = [
     q("score-01", "スコア", "通常ゲームで、先に4ポイントを取り2ポイント差がついた。どう扱う？", ["そのゲームを取得", "もう1ポイント行う", "ノーカウントにする", "ファイナルゲームに入る"], 0, "ゲーム", "通常ゲームは、決められたポイント数に達し、必要な差がついた時点でゲームが決まります。", "match"),
     q("score-02", "スコア", "ファイナルゲームで目安になる先取ポイントは？", ["7ポイント", "4ポイント", "5ポイント", "10ポイント"], 0, "ファイナルゲーム", "ファイナルゲームは7ポイントを目安に進みます。接戦では必要な差がつくまで続きます。", "match"),
@@ -149,18 +154,28 @@
     };
   }
 
-  const expanded = [...baseQuestions];
-  let variantIndex = 0;
-  while (expanded.length < 150) {
-    const item = baseQuestions[variantIndex % baseQuestions.length];
-    const prefix = scenarioPrefixes[Math.floor(variantIndex / baseQuestions.length) % scenarioPrefixes.length];
-    expanded.push(cloneQuestion(item, Math.floor(variantIndex / baseQuestions.length) + 1, prefix));
-    variantIndex += 1;
+  const reviewedQuestions = [];
+  const reviewedCategoryCounts = {};
+
+  function addReviewedQuestion(question) {
+    if (question.reviewStatus !== "reviewed" || reviewedQuestions.length >= 150) return false;
+    const limit = reviewedCategoryLimits[question.category];
+    const count = reviewedCategoryCounts[question.category] || 0;
+    if (limit && count >= limit) return false;
+    reviewedQuestions.push(question);
+    reviewedCategoryCounts[question.category] = count + 1;
+    return true;
   }
 
-  const reviewedQuestions = expanded
-    .filter((item) => item.reviewStatus === "reviewed")
-    .slice(0, 150);
+  baseQuestions.forEach(addReviewedQuestion);
+
+  let variantIndex = 0;
+  while (reviewedQuestions.length < 150 && variantIndex < baseQuestions.length * scenarioPrefixes.length * 5) {
+    const item = baseQuestions[variantIndex % baseQuestions.length];
+    const prefix = scenarioPrefixes[Math.floor(variantIndex / baseQuestions.length) % scenarioPrefixes.length];
+    addReviewedQuestion(cloneQuestion(item, Math.floor(variantIndex / baseQuestions.length) + 1, prefix));
+    variantIndex += 1;
+  }
 
   globalThis.SOFT_TENNIS_REFEREE_QUESTION_CATEGORIES = categories;
   globalThis.SOFT_TENNIS_REFEREE_QUESTIONS = reviewedQuestions;

@@ -17,6 +17,7 @@ const sources = context.SOFT_TENNIS_REFEREE_SOURCES;
 const questions = context.SOFT_TENNIS_REFEREE_QUESTIONS;
 const sourceIds = new Set(sources.map((source) => source.id));
 const ids = new Set();
+const categoryCounts = {};
 
 function assert(condition, message) {
   if (!condition) {
@@ -58,6 +59,7 @@ for (const question of questions) {
   assert(question.choices.length === 4, `question ${question.id} should have 4 choices`);
   assert(question.choices.some((choice) => choice.id === question.answerId), `question ${question.id} answerId missing`);
   assert(question.sourceRefs.every((sourceId) => sourceIds.has(sourceId)), `question ${question.id} has unknown source`);
+  categoryCounts[question.category] = (categoryCounts[question.category] || 0) + 1;
 
   if (question.category === "2026年コイントス運用") {
     assert(question.effectiveFrom, `coin toss question ${question.id} missing effectiveFrom`);
@@ -66,11 +68,15 @@ for (const question of questions) {
   }
 }
 
+assert(categoryCounts["2026年コイントス運用"] <= 3, "coin toss questions should stay light for beginners");
+assert(categoryCounts["ヒートルール"] <= 3, "heat rule questions should stay light for beginners");
+
 const sourceText = ["index.html", "styles.css", "app.js", "questions.js"]
   .map((file) => fs.readFileSync(path.join(root, file), "utf8"))
   .join("\n");
 
 assert(!sourceText.includes("🎾"), "hard-tennis-style tennis ball emoji must not be used");
 assert(!/tennis-ball|hard tennis|硬式テニスボール|フェルト/.test(sourceText), "hard tennis ball wording should not appear in UI source");
+assert(!/A: |B: |C: |出典ランク/.test(sourceText), "source rank should not be shown to beginner users");
 
 console.log(`OK: ${questions.length} questions, ${sources.length} sources`);

@@ -196,7 +196,7 @@
     return question.sourceRefs
       .map((id) => sourceMap[id])
       .filter(Boolean)
-      .map((source) => `<a href="${escapeAttr(source.url)}" target="_blank" rel="noreferrer">${escapeHtml(source.rank)}: ${escapeHtml(source.publisher)}</a>`)
+      .map((source) => `<a href="${escapeAttr(source.url)}" target="_blank" rel="noreferrer">${escapeHtml(source.publisher)}</a>`)
       .join("");
   }
 
@@ -273,8 +273,8 @@
           <p>むずかしい言葉はあとで確認。まずは場面で覚えよう。</p>
         </div>
         <div class="rule-update-card">
-          <strong>試合前のトスも確認</strong>
-          <p>2026年からのコイントス運用も、公式資料・連盟資料を確認して入れています。</p>
+          <strong>基本ルールの練習用</strong>
+          <p>できるだけ正しく作っていますが、大会やその日の決まりで変わることがあります。当日の審判委員・大会要項の指示を優先してください。</p>
         </div>
         <div class="category-grid">
           ${stats
@@ -292,7 +292,7 @@
           ${sources
             .map(
               (source) => `<a href="${escapeAttr(source.url)}" target="_blank" rel="noreferrer" class="source-row">
-                <span>${escapeHtml(source.rank)}</span>
+                <span>資料</span>
                 <div>
                   <strong>${escapeHtml(source.title)}</strong>
                   <small>${escapeHtml(source.publisher)} / 確認日 ${escapeHtml(source.checkedAt)}</small>

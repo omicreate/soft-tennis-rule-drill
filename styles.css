@@ -696,7 +696,7 @@ h1 {
   overflow: hidden;
   padding: 17px 18px;
   border-radius: var(--radius);
-  background: linear-gradient(145deg, #103a55, #0a2336);
+  background: linear-gradient(145deg, #14473f, #0b2d2b);
   color: #fff;
   box-shadow: var(--shadow);
 }
@@ -723,10 +723,10 @@ h1 {
 }
 
 .rule-update-card strong::before {
-  content: "NEW";
+  content: "確認";
   padding: 2px 8px;
   border-radius: var(--pill);
-  background: var(--green);
+  background: #f2c94c;
   color: #fff;
   font-size: 10px;
   font-weight: 800;
