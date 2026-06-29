@@ -154,18 +154,18 @@
   function renderCourtIllustration(question) {
     const coinMode = question?.category === "2026年コイントス運用";
     return `
-      <div class="court-visual ${coinMode ? "coin-mode" : ""}" aria-hidden="true">
-        <div class="court-sky"></div>
-        <div class="court-lines">
-          <span class="net-line"></span>
-          <span class="service-line"></span>
-          <span class="center-line"></span>
-          <span class="side-line left"></span>
-          <span class="side-line right"></span>
+      <div class="drill-visual ${coinMode ? "coin-mode" : ""}" aria-hidden="true">
+        <div class="visual-board">
+          <span class="visual-chip">4択</span>
+          <strong>${coinMode ? "試合前の確認" : "基本ルール"}</strong>
+          <small>${coinMode ? "大会のきまりを見てから進める" : "場面をえらんで覚える"}</small>
         </div>
-        <span class="plain-ball visual-ball"></span>
-        <span class="ball-trail"></span>
-        ${coinMode ? '<span class="coin-disc">表</span><span class="coin-disc second">裏</span>' : ""}
+        <div class="visual-choice-list">
+          <span></span>
+          <span></span>
+          <span class="is-selected"></span>
+        </div>
+        <div class="visual-check">✓</div>
       </div>
     `;
   }
@@ -228,8 +228,8 @@
           <p>間違えた問題と、まだ少ないところを見て、次のドリルにつなげよう。</p>
         </div>
         <div class="rule-update-card">
-          <strong>基本ルールの練習用</strong>
-          <p>できるだけ正しく作っていますが、大会やその日の決まりで変わることがあります。当日の審判委員・大会要項の指示を優先してください。</p>
+          <strong>親子で確認できる基本ルール</strong>
+          <p>できるだけ正しく作っていますが、大会やその日の決まりで変わることがあります。実際の試合では、当日の大会要項・審判委員の案内を優先してください。</p>
         </div>
         <section class="review-list">
           <h2>もう一度やる問題</h2>

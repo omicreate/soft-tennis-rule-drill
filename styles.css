@@ -86,32 +86,66 @@ a {
 .brand-mark::before {
   content: "";
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background:
-    linear-gradient(90deg, transparent 47%, rgba(255, 255, 255, 0.16) 49% 51%, transparent 53%),
-    linear-gradient(0deg, transparent 47%, rgba(255, 255, 255, 0.16) 49% 51%, transparent 53%);
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  height: 5px;
+  border-radius: var(--pill);
+  background: rgba(255, 255, 255, 0.75);
 }
 
-.brand-mark .plain-ball {
+.rule-card-icon {
   position: relative;
   z-index: 1;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 30px;
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, rgba(10, 122, 75, 0.13) 0 24%, transparent 24%),
+    #ffffff;
+  box-shadow: 0 5px 12px rgba(20, 65, 50, 0.18);
 }
 
-/* 無地の白丸ボール方針（README参照）に合わせ、ボールの縫い目（曲線）は表示しない。 */
-.brand-mark .racket-stem {
-  display: none;
-}
-
-.plain-ball {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
+.rule-card-icon::before,
+.rule-card-icon::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  height: 3px;
   border-radius: var(--pill);
-  background: radial-gradient(circle at 34% 28%, #ffffff 0 32%, #f2f5f7 56%, #d9e0e4 100%);
-  box-shadow: inset -2px -3px 5px rgba(120, 140, 150, 0.28), 0 4px 10px rgba(40, 70, 90, 0.18);
+  background: rgba(10, 122, 75, 0.72);
+}
+
+.rule-card-icon::before {
+  top: 13px;
+}
+
+.rule-card-icon::after {
+  top: 20px;
+}
+
+.rule-check-icon {
+  position: absolute;
+  right: 9px;
+  bottom: 8px;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: #f2c94c;
+}
+
+.rule-check-icon::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 3px;
+  width: 7px;
+  height: 4px;
+  border-left: 3px solid var(--green-dark);
+  border-bottom: 3px solid var(--green-dark);
+  transform: rotate(-45deg);
 }
 
 .source-line {
@@ -247,154 +281,103 @@ h1 {
   transition: width 280ms cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
-.court-visual {
+.drill-visual {
   position: relative;
-  height: 168px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 14px;
+  align-items: center;
+  min-height: 168px;
+  padding: 18px;
   overflow: hidden;
   border-radius: var(--radius) var(--radius) 0 0;
-  background: linear-gradient(180deg, #9fe1f1 0 34%, #3a9c64 35%, #2f8b58 100%);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 55%),
+    linear-gradient(145deg, #0d8d5c, #0b6f52);
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.25);
 }
 
-.court-sky::before,
-.court-sky::after {
+.drill-visual::before {
   content: "";
   position: absolute;
-  top: 26px;
-  width: 78px;
-  height: 26px;
+  inset: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 13px;
+}
+
+.visual-board {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 28px rgba(8, 57, 42, 0.18);
+}
+
+.visual-chip {
+  justify-self: start;
+  padding: 2px 9px;
   border-radius: var(--pill);
-  background: rgba(255, 255, 255, 0.82);
-  filter: blur(0.3px);
+  background: var(--green-soft);
+  color: var(--green-dark);
+  font-size: 11px;
+  font-weight: 800;
 }
 
-.court-sky::before {
-  left: 22px;
+.visual-board strong {
+  color: var(--ink);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
 }
 
-.court-sky::after {
-  right: 30px;
-  width: 58px;
-  top: 40px;
+.visual-board small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
-.court-lines {
+.visual-choice-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 9px;
+}
+
+.visual-choice-list span {
+  display: block;
+  height: 20px;
+  border-radius: var(--pill);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.visual-choice-list span:nth-child(2) {
+  width: 82%;
+}
+
+.visual-choice-list .is-selected {
+  width: 94%;
+  background: #f2c94c;
+}
+
+.visual-check {
   position: absolute;
-  left: 6%;
-  right: 6%;
-  bottom: 14px;
-  height: 96px;
-  border: 4px solid rgba(255, 255, 255, 0.95);
-  transform: perspective(260px) rotateX(54deg);
-  transform-origin: bottom center;
-}
-
-.court-lines::before,
-.court-lines::after,
-.net-line,
-.service-line,
-.center-line,
-.side-line {
-  content: "";
-  position: absolute;
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.court-lines::before {
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 4px;
-}
-
-.court-lines::after {
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-}
-
-.net-line {
-  left: -5%;
-  right: -5%;
-  top: 48%;
-  height: 7px;
-  background: var(--ink);
-  box-shadow: 0 4px 0 rgba(255, 255, 255, 0.6);
-}
-
-.service-line {
-  left: 18%;
-  right: 18%;
-  top: 27%;
-  height: 4px;
-}
-
-.center-line {
-  left: 50%;
-  top: 27%;
-  bottom: 0;
-  width: 4px;
-}
-
-.side-line.left,
-.side-line.right {
-  top: 0;
-  bottom: 0;
-  width: 4px;
-}
-
-.side-line.left {
-  left: 18%;
-}
-
-.side-line.right {
-  right: 18%;
-}
-
-.visual-ball {
-  position: absolute;
-  left: 34%;
-  top: 58px;
-  width: 26px;
-  height: 26px;
-  animation: ball-float 2.4s ease-in-out infinite;
-}
-
-.ball-trail {
-  position: absolute;
-  left: 41%;
-  top: 76px;
-  width: 112px;
-  height: 62px;
-  border-top: 4px dashed rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  transform: rotate(24deg);
-}
-
-.coin-disc {
-  position: absolute;
-  right: 30px;
-  top: 50px;
+  right: 21px;
+  bottom: 16px;
+  z-index: 2;
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
-  border-radius: var(--pill);
-  background: linear-gradient(145deg, #fff3b0, #f3b134);
-  color: #5d3d00;
-  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--green-dark);
+  font-size: 26px;
   font-weight: 800;
-  box-shadow: 0 12px 22px rgba(97, 65, 8, 0.26), inset 0 2px 4px rgba(255, 255, 255, 0.6);
-}
-
-.coin-disc.second {
-  right: 76px;
-  top: 100px;
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(145deg, #fbfdff, #c4d2e0);
-  color: #2f4358;
+  box-shadow: 0 12px 22px rgba(8, 57, 42, 0.18);
 }
 
 .question-card {

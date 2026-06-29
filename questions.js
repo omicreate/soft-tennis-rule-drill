@@ -138,7 +138,7 @@
       sourceRefs: refs,
       sourceRank,
       effectiveFrom: effectiveFrom || "",
-      scopeNote: scopeNote || "小中学生の審判学習向けに、公式資料をもとに自作した要約問題。",
+      scopeNote: scopeNote || "ソフトテニスを始めたばかりの子どもと保護者向けに、公式資料をもとに自作した要約問題。",
       lastVerified: CHECKED_AT,
       tags: [tag, category],
       reviewStatus: "reviewed"

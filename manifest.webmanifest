@@ -1,7 +1,7 @@
 {
   "name": "ソフテニルールドリル",
   "short_name": "ルールドリル",
-  "description": "ソフトテニスの公式用語、審判コール、2026年コイントス運用、ヒートルールを4択で学ぶスマホ向けPWA。",
+  "description": "ソフトテニスを始めたばかりの子どもと保護者向けに、基本ルールを4択ドリルで確認できるスマホ・タブレット向けPWA。",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
