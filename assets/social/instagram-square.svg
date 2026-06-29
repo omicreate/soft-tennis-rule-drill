@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs>
+    <linearGradient id="logoBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0e9d62"/>
+      <stop offset="1" stop-color="#0a7a4b"/>
+    </linearGradient>
+    <style>
+      text { font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif; letter-spacing: 0; }
+    </style>
+  </defs>
+  
+    <rect width="1080" height="1080" fill="#eef7f2"/>
+    <circle cx="993.6" cy="21.6" r="345.6" fill="#d9f0e6" opacity="0.72"/>
+    <circle cx="86.4" cy="1026" r="280.8" fill="#ffffff" opacity="0.58"/>
+    <path d="M 86.4 194.4 C 248.4 86.4, 388.8 172.8, 540 86.4" fill="none" stroke="#0e9d62" stroke-width="10" stroke-linecap="round" opacity="0.18"/>
+  
+  
+    
+    <g transform="translate(82 82)">
+      <rect width="148" height="148" rx="35.519999999999996" fill="url(#logoBg)"/>
+      <rect x="35.519999999999996" y="26.64" width="76.96000000000001" height="94.72" rx="11.84" fill="#ffffff"/>
+      <rect x="45.88" y="39.96" width="56.24" height="10.360000000000001" rx="5.180000000000001" fill="#d9f0e6"/>
+      <rect x="45.88" y="65.12" width="56.24" height="6.66" rx="3.256" fill="#dfeaff"/>
+      <rect x="45.88" y="82.88000000000001" width="48.84" height="6.66" rx="3.256" fill="#f5b939"/>
+      <rect x="90.28" y="87.32" width="26.64" height="26.64" rx="6.66" fill="#0a7a4b"/>
+      <path d="M 96.2 100.64 l 5.180000000000001 5.92 l 11.1 -15.54" fill="none" stroke="#ffffff" stroke-width="5.180000000000001" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="260" y="145" fill="#0a7a4b" font-size="36" font-weight="900">公開中</text>
+    <text x="82" y="356" fill="#122a3d" font-size="75" font-weight="900">ソフテニルールドリル</text>
+    <text x="86" y="442" fill="#0a7a4b" font-size="48" font-weight="900">親子で基本ルール</text>
+    <text x="88" y="510" fill="#5d7184" font-size="31" font-weight="800">1セット10問 / 4択ドリル / 記録つき</text>
+    <rect x="82" y="602" width="916" height="282" rx="44" fill="#ffffff" stroke="#dcebe4" stroke-width="3"/>
+    
+    <g>
+      <rect x="132" y="652" width="232" height="150" rx="28" fill="#ffffff" stroke="#dcebe4" stroke-width="2"/>
+      <text x="159.84" y="709" fill="#5d7184" font-size="30" font-weight="800">1セット</text>
+      <text x="159.84" y="766" fill="#0a7a4b" font-size="51.00000000000001" font-weight="900">10問</text>
+    </g>
+    
+    <g>
+      <rect x="424" y="652" width="232" height="150" rx="28" fill="#ffffff" stroke="#dcebe4" stroke-width="2"/>
+      <text x="451.84" y="709" fill="#5d7184" font-size="30" font-weight="800">問題数</text>
+      <text x="451.84" y="766" fill="#ee4d54" font-size="51.00000000000001" font-weight="900">150</text>
+    </g>
+    
+    <g>
+      <rect x="716" y="652" width="232" height="150" rx="28" fill="#ffffff" stroke="#dcebe4" stroke-width="2"/>
+      <text x="743.84" y="709" fill="#5d7184" font-size="30" font-weight="800">形式</text>
+      <text x="743.84" y="766" fill="#f5b939" font-size="51.00000000000001" font-weight="900">4択</text>
+    </g>
+    <text x="86" y="960" fill="#5d7184" font-size="29" font-weight="800">スマホ・タブレットで使えます</text>
+  
+</svg>

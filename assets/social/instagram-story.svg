@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="logoBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0e9d62"/>
+      <stop offset="1" stop-color="#0a7a4b"/>
+    </linearGradient>
+    <style>
+      text { font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif; letter-spacing: 0; }
+    </style>
+  </defs>
+  
+    <rect width="1080" height="1920" fill="#eef7f2"/>
+    <circle cx="993.6" cy="38.4" r="345.6" fill="#d9f0e6" opacity="0.72"/>
+    <circle cx="86.4" cy="1824" r="280.8" fill="#ffffff" opacity="0.58"/>
+    <path d="M 86.4 345.59999999999997 C 248.4 153.6, 388.8 307.2, 540 153.6" fill="none" stroke="#0e9d62" stroke-width="10" stroke-linecap="round" opacity="0.18"/>
+  
+  
+    
+    <g transform="translate(84 112)">
+      <rect width="166" height="166" rx="39.839999999999996" fill="url(#logoBg)"/>
+      <rect x="39.84" y="29.879999999999995" width="86.32000000000001" height="106.24000000000001" rx="13.280000000000001" fill="#ffffff"/>
+      <rect x="51.46" y="44.82" width="63.08" height="11.620000000000001" rx="5.8100000000000005" fill="#d9f0e6"/>
+      <rect x="51.46" y="73.04" width="63.08" height="7.47" rx="3.6519999999999997" fill="#dfeaff"/>
+      <rect x="51.46" y="92.96000000000001" width="54.78" height="7.47" rx="3.6519999999999997" fill="#f5b939"/>
+      <rect x="101.25999999999999" y="97.94" width="29.88" height="29.88" rx="7.47" fill="#0a7a4b"/>
+      <path d="M 107.9 112.88000000000001 l 5.8100000000000005 6.640000000000001 l 12.45 -17.43" fill="none" stroke="#ffffff" stroke-width="5.8100000000000005" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="84" y="400" fill="#122a3d" font-size="72" font-weight="900">ソフトテニスを始めたら</text>
+    <text x="86" y="498" fill="#0a7a4b" font-size="58" font-weight="900">10問ずつルール確認</text>
+    <text x="88" y="575" fill="#5d7184" font-size="34" font-weight="800">子どもと保護者向けの4択ドリル</text>
+    <rect x="84" y="725" width="912" height="548" rx="54" fill="#ffffff" stroke="#dcebe4" stroke-width="3"/>
+    <text x="144" y="850" fill="#122a3d" font-size="47" font-weight="900">今日のセット</text>
+    <text x="144" y="1015" fill="#0a7a4b" font-size="120" font-weight="900">10問</text>
+    <text x="144" y="1110" fill="#5d7184" font-size="35" font-weight="800">短い時間で、くり返し確認</text>
+    
+    <g>
+      <rect x="144" y="1160" width="300" height="58" rx="29" fill="#ffffff" stroke="#dcebe4" stroke-width="2"/>
+      <circle cx="178" cy="1189" r="10" fill="#0e9d62"/>
+      <text x="202" y="1198" fill="#122a3d" font-size="25" font-weight="800">4択で答える</text>
+    </g>
+    
+    <g>
+      <rect x="474" y="1160" width="290" height="58" rx="29" fill="#ffffff" stroke="#dcebe4" stroke-width="2"/>
+      <circle cx="508" cy="1189" r="10" fill="#0e9d62"/>
+      <text x="532" y="1198" fill="#122a3d" font-size="25" font-weight="800">記録を見る</text>
+    </g>
+    <rect x="84" y="1420" width="912" height="200" rx="44" fill="#0a7a4b"/>
+    <text x="144" y="1512" fill="#ffffff" font-size="42" font-weight="900">ソフテニルールドリル</text>
+    <text x="144" y="1580" fill="#d9f0e6" font-size="30" font-weight="800">公開中のWebアプリ</text>
+  
+</svg>
