@@ -1,30 +1,24 @@
-# 公開・テスト環境の運用メモ
+# 公開運用メモ
 
 ## URLの考え方
 
-本番用:
+公開用:
 
 - GitHubリポジトリ: `omicreate/soft-tennis-rule-drill`
 - 公開URL: `https://omicreate.github.io/soft-tennis-rule-drill/`
 - 用途: ソフトテニスを始めたばかりの子ども、保護者、指導者、テスト協力者へ案内するURL
 
-テスト用を分ける場合:
-
-- GitHubリポジトリ: `omicreate/soft-tennis-rule-drill-preview`
-- 公開URL: `https://omicreate.github.io/soft-tennis-rule-drill-preview/`
-- 用途: SNS案内前に自分のスマホで確認するURL
-
 ## 基本方針
 
-- PC内の `/Users/omi/Documents/SoftTennis/soft-tennis-rule-drill` を本番の元データとして扱う
-- GitHub上で直接編集せず、PC側で編集してからGitHubへ反映する
+- 公開リポジトリには、個人PCの絶対パス、端末固有情報、連絡先、非公開資料を記載しない
+- 修正はローカルの作業コピーで確認してからGitHubへ反映する
 - 公開前に `docs/update-rules.md` の確認手順で出典を見直す
 - 公式ロゴ、公式認定、公式監修と誤認される表示を使わない
 - 開発内容はREADME、CHANGELOG、docs配下へ残す
 
 ## 通常の流れ
 
-1. `soft-tennis-rule-drill` で修正する
+1. 作業コピーで修正する
 2. ローカルで動作確認する
 3. `npm test` が通ることを確認する
 4. 必要に応じて `CHANGELOG.md` と関連Markdownを更新する
@@ -58,10 +52,10 @@
 - トップ画面でタイトルが `ソフテニルールドリル` になっている
 - 4択問題を回答できる
 - `ドリル`、`振り返り`、`記録` の表示を確認できる
-- 出典リンクが開ける
 - ホーム画面追加時の名前が `ルールドリル` になる
 - SNS共有時にタイトル、説明、OGP画像が表示される
 - READMEに対象ユーザー、非公式アプリであること、利用条件、プライバシー方針がある
+- READMEやdocsに個人PCの絶対パス、端末固有情報、非公開メモがない
 
 ## 注意点
 

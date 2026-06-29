@@ -54,17 +54,14 @@
 
 ## ローカル確認
 
+このリポジトリを取得したフォルダで実行します。個人PCの絶対パスは不要です。
+
 ```sh
-cd /Users/omi/Documents/SoftTennis/soft-tennis-rule-drill
 npm test
 python3 -m http.server 8000
 ```
 
-確認URL:
-
-```text
-http://127.0.0.1:8000/index.html
-```
+ブラウザで表示されたローカルサーバーのURLを開いて確認します。
 
 ## 公開想定
 
