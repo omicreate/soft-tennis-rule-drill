@@ -1,14 +1,17 @@
 (() => {
   const STORAGE_KEY = "soft-tennis-rule-drill-progress-v1";
+  const DRILL_SET_SIZE = 10;
 
   const questions = globalThis.SOFT_TENNIS_REFEREE_QUESTIONS || [];
-  const sources = globalThis.SOFT_TENNIS_REFEREE_SOURCES || [];
   const categories = globalThis.SOFT_TENNIS_REFEREE_QUESTION_CATEGORIES || [];
-  const sourceMap = Object.fromEntries(sources.map((source) => [source.id, source]));
+  const questionMap = new Map(questions.map((question) => [question.id, question]));
 
   const state = {
     tab: "quiz",
-    quizQueue: [],
+    drillSet: [],
+    drillIndex: 0,
+    setCorrect: 0,
+    setFinished: false,
     currentQuestion: null,
     selectedAnswerId: "",
     progress: loadProgress()
@@ -25,7 +28,9 @@
       totalAnswered: 0,
       totalCorrect: 0,
       lastStudyAt: "",
-      reviewQueue: []
+      reviewQueue: [],
+      drillSeenIds: [],
+      drillSeenKeys: []
     };
   }
 
@@ -62,14 +67,75 @@
     };
   }
 
-  function nextQuestion() {
-    if (state.quizQueue.length === 0) {
-      const reviewIds = new Set(state.progress.reviewQueue.slice(0, 20));
-      const priority = reviewedQuestions().filter((question) => reviewIds.has(question.id));
-      const fresh = reviewedQuestions().filter((question) => !reviewIds.has(question.id));
-      state.quizQueue = [...shuffle(priority), ...shuffle(fresh)];
+  function startDrillSet(category = "") {
+    const set = buildDrillSet(category);
+    state.drillSet = set.map((question) => question.id);
+    state.drillIndex = 0;
+    state.setCorrect = 0;
+    state.setFinished = set.length === 0;
+    state.currentQuestion = set.length ? normalizeQuestion(set[0]) : null;
+    state.selectedAnswerId = "";
+  }
+
+  function buildDrillSet(category = "") {
+    const allQuestions = reviewedQuestions().filter((question) => !category || question.category === category);
+    const seenIds = new Set(state.progress.drillSeenIds || []);
+    const seenKeys = new Set(state.progress.drillSeenKeys || []);
+    let pool = allQuestions.filter((question) => !seenIds.has(question.id) && !seenKeys.has(displayKey(question)));
+    if (pool.length === 0) {
+      state.progress.drillSeenIds = category
+        ? (state.progress.drillSeenIds || []).filter((id) => questionMap.get(id)?.category !== category)
+        : [];
+      state.progress.drillSeenKeys = category
+        ? (state.progress.drillSeenKeys || []).filter((key) => {
+            const source = reviewedQuestions().find((question) => displayKey(question) === key);
+            return !source || source.category !== category;
+          })
+        : [];
+      pool = allQuestions;
     }
-    state.currentQuestion = normalizeQuestion(state.quizQueue.shift());
+    return selectBalancedQuestions(pool, Math.min(DRILL_SET_SIZE, pool.length));
+  }
+
+  function selectBalancedQuestions(pool, size) {
+    const buckets = new Map();
+    for (const question of shuffle(pool)) {
+      const bucket = buckets.get(question.category) || [];
+      bucket.push(question);
+      buckets.set(question.category, bucket);
+    }
+    let categoryOrder = shuffle(categories.filter((category) => buckets.has(category)));
+    const selected = [];
+    const selectedKeys = new Set();
+    let cursor = 0;
+    while (selected.length < size && categoryOrder.length > 0) {
+      const category = categoryOrder[cursor % categoryOrder.length];
+      const bucket = buckets.get(category) || [];
+      const next = bucket.shift();
+      if (next && !selectedKeys.has(displayKey(next))) {
+        selected.push(next);
+        selectedKeys.add(displayKey(next));
+      }
+      if (bucket.length === 0) {
+        categoryOrder = categoryOrder.filter((item) => item !== category);
+        cursor = 0;
+      } else {
+        cursor += 1;
+      }
+    }
+    return selected;
+  }
+
+  function nextQuestion() {
+    if (state.drillIndex >= state.drillSet.length - 1) {
+      state.setFinished = true;
+      state.currentQuestion = null;
+      state.selectedAnswerId = "";
+      render();
+      return;
+    }
+    state.drillIndex += 1;
+    state.currentQuestion = normalizeQuestion(questionMap.get(state.drillSet[state.drillIndex]));
     state.selectedAnswerId = "";
   }
 
@@ -78,6 +144,7 @@
     const question = state.currentQuestion;
     const correct = answerId === question.answerId;
     state.selectedAnswerId = answerId;
+    state.setCorrect += correct ? 1 : 0;
     state.progress.totalAnswered += 1;
     state.progress.totalCorrect += correct ? 1 : 0;
     state.progress.streak = correct ? state.progress.streak + 1 : 0;
@@ -98,6 +165,11 @@
     state.progress.reviewQueue = correct
       ? state.progress.reviewQueue.filter((id) => id !== question.id)
       : [question.id, ...state.progress.reviewQueue.filter((id) => id !== question.id)].slice(0, 60);
+    state.progress.drillSeenIds = [question.id, ...(state.progress.drillSeenIds || []).filter((id) => id !== question.id)]
+      .filter((id) => questionMap.has(id))
+      .slice(0, reviewedQuestions().length);
+    state.progress.drillSeenKeys = [displayKey(question), ...(state.progress.drillSeenKeys || []).filter((key) => key !== displayKey(question))]
+      .slice(0, reviewedQuestions().length);
     saveProgress();
     render();
   }
@@ -143,14 +215,6 @@
     });
   }
 
-  function sourceLinks(question) {
-    return question.sourceRefs
-      .map((id) => sourceMap[id])
-      .filter(Boolean)
-      .map((source) => `<a href="${escapeAttr(source.url)}" target="_blank" rel="noreferrer">${escapeHtml(source.publisher)}</a>`)
-      .join("");
-  }
-
   function renderCourtIllustration(question) {
     const coinMode = question?.category === "2026年コイントス運用";
     return `
@@ -171,18 +235,23 @@
   }
 
   function renderQuiz() {
-    if (!state.currentQuestion) nextQuestion();
+    if (!state.currentQuestion && !state.setFinished) startDrillSet();
+    if (state.setFinished) {
+      renderSetComplete();
+      return;
+    }
     const question = state.currentQuestion;
     const selected = state.selectedAnswerId;
     const isCorrect = selected && selected === question.answerId;
-    const progressText = `${reviewedQuestions().length - state.quizQueue.length}/${reviewedQuestions().length}`;
+    const progressText = `${state.drillIndex + 1}/${state.drillSet.length}`;
+    const progressRate = ((state.drillIndex + (selected ? 1 : 0)) / state.drillSet.length) * 100;
     viewRoot.innerHTML = `
       <section class="quiz-panel">
         <div class="quiz-meta">
-          <span>問題</span>
+          <span>今日のセット</span>
           <strong>${escapeHtml(progressText)}</strong>
         </div>
-        <div class="progress-track"><span class="${widthClass(Math.min(100, (state.progress.totalAnswered % reviewedQuestions().length) / reviewedQuestions().length * 100))}"></span></div>
+        <div class="progress-track"><span class="${widthClass(progressRate)}"></span></div>
         ${renderCourtIllustration(question)}
         <div class="question-card">
           <p class="question-id">ことば: ${escapeHtml(displayTerm(question))}</p>
@@ -206,11 +275,24 @@
             ? `<section class="answer-card ${isCorrect ? "is-correct" : "is-wrong"}">
                 <strong>${isCorrect ? "正解。ナイスジャッジ！" : "もう一度確認しよう"}</strong>
                 <p><b>${escapeHtml(question.officialTerm)}</b> / ${escapeHtml(question.plainExplanation)}</p>
-                <div class="source-list">${sourceLinks(question)}</div>
-                <button class="primary-action" id="nextQuestionButton" type="button">次の問題へ</button>
+                <button class="primary-action" id="nextQuestionButton" type="button">${state.drillIndex >= state.drillSet.length - 1 ? "結果を見る" : "次の問題へ"}</button>
               </section>`
             : `<p class="hint-line">選ぶと、正しいことばと短い説明が出ます。</p>`
         }
+      </section>
+    `;
+  }
+
+  function renderSetComplete() {
+    viewRoot.innerHTML = `
+      <section class="complete-panel">
+        <div class="complete-card">
+          <span>1セット完了</span>
+          <h2>${state.setCorrect}/${state.drillSet.length} 正解</h2>
+          <p>${escapeHtml(setCompleteMessage())}</p>
+          <button class="primary-action wide" id="startNextSetButton" type="button">次の10問へ</button>
+          <button class="ghost-action wide" id="goReviewButton" type="button">振り返りを見る</button>
+        </div>
       </section>
     `;
   }
@@ -225,11 +307,7 @@
       <section class="learn-panel">
         <div class="section-heading">
           <h2>振り返り</h2>
-          <p>間違えた問題と、まだ少ないところを見て、次のドリルにつなげよう。</p>
-        </div>
-        <div class="rule-update-card">
-          <strong>親子で確認できる基本ルール</strong>
-          <p>できるだけ正しく作っていますが、大会やその日の決まりで変わることがあります。実際の試合では、当日の大会要項・審判委員の案内を優先してください。</p>
+          <p>${escapeHtml(reviewMessage())}</p>
         </div>
         <section class="review-list">
           <h2>もう一度やる問題</h2>
@@ -251,20 +329,6 @@
             )
             .join("")}
         </div>
-        <section class="source-panel">
-          <h3>参考にした資料</h3>
-          ${sources
-            .map(
-              (source) => `<a href="${escapeAttr(source.url)}" target="_blank" rel="noreferrer" class="source-row">
-                <span>資料</span>
-                <div>
-                  <strong>${escapeHtml(source.title)}</strong>
-                  <small>${escapeHtml(source.publisher)} / 確認日 ${escapeHtml(source.checkedAt)}</small>
-                </div>
-              </a>`
-            )
-            .join("")}
-        </section>
       </section>
     `;
   }
@@ -275,6 +339,10 @@
     const stats = categoryStats();
     viewRoot.innerHTML = `
       <section class="record-panel">
+        <div class="motivation-card">
+          <strong>いいペースです</strong>
+          <p>${escapeHtml(recordMessage(total, accuracy))}</p>
+        </div>
         <div class="record-summary">
           <div><span>回答数</span><strong>${total}</strong></div>
           <div><span>正答率</span><strong>${accuracy}%</strong></div>
@@ -301,6 +369,24 @@
     if (state.tab === "review") renderReview();
     if (state.tab === "quiz") renderQuiz();
     if (state.tab === "record") renderRecord();
+  }
+
+  function setCompleteMessage() {
+    if (state.setCorrect === state.drillSet.length) return "満点です。今日のルール確認はばっちりです。";
+    if (state.setCorrect >= Math.ceil(state.drillSet.length * 0.7)) return "かなりいい感じです。迷った問題だけ見直せば、もっと安心です。";
+    return "ここまで進めたことが大事です。まちがえた問題は、次に覚えるチャンスです。";
+  }
+
+  function reviewMessage() {
+    if ((state.progress.reviewQueue || []).length === 0) return "今は復習リストが空です。まずは1セット、気軽にやってみましょう。";
+    return "まちがいは弱点ではなく、次に分かるようになる場所です。少しずつ確認していきましょう。";
+  }
+
+  function recordMessage(total, accuracy) {
+    if (total === 0) return "まずは10問だけで大丈夫。親子で話しながら始められます。";
+    if (accuracy >= 80) return "よく覚えています。次は試合の場面を思い浮かべながら進めてみましょう。";
+    if (accuracy >= 50) return "少しずつ分かることが増えています。続けるほど、試合を見るのも楽になります。";
+    return "最初は知らない言葉が多くて普通です。1セットずつ進めれば十分です。";
   }
 
   function escapeHtml(value) {
@@ -406,6 +492,10 @@
     };
 
     return easyPrompts[normalized] || normalized;
+  }
+
+  function displayKey(question) {
+    return `${displayTerm(question)}::${displayPrompt(question)}`.replace(/\s+/g, " ").trim();
   }
 
   function stripScenarioPrefix(text) {
@@ -542,11 +632,24 @@
       return;
     }
 
+    const startNextSetButton = event.target.closest("#startNextSetButton");
+    if (startNextSetButton) {
+      startDrillSet();
+      render();
+      return;
+    }
+
+    const goReviewButton = event.target.closest("#goReviewButton");
+    if (goReviewButton) {
+      state.tab = "review";
+      render();
+      return;
+    }
+
     const categoryButton = event.target.closest("[data-category]");
     if (categoryButton) {
       const selectedCategory = categoryButton.dataset.category;
-      state.quizQueue = shuffle(reviewedQuestions().filter((question) => question.category === selectedCategory));
-      nextQuestion();
+      startDrillSet(selectedCategory);
       state.tab = "quiz";
       render();
       return;
@@ -556,6 +659,10 @@
     if (reviewButton) {
       const question = questions.find((item) => item.id === reviewButton.dataset.review);
       if (question) {
+        state.drillSet = [question.id];
+        state.drillIndex = 0;
+        state.setCorrect = 0;
+        state.setFinished = false;
         state.currentQuestion = normalizeQuestion(question);
         state.selectedAnswerId = "";
         state.tab = "quiz";
@@ -567,12 +674,13 @@
     const resetButton = event.target.closest("#resetProgressButton");
     if (resetButton && confirm("この端末の学習記録を消しますか？")) {
       state.progress = defaultProgress();
+      startDrillSet();
       saveProgress();
       render();
     }
   });
 
-  nextQuestion();
+  startDrillSet();
   render();
 
   if ("serviceWorker" in navigator) {

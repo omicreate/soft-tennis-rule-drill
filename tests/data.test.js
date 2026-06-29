@@ -80,5 +80,7 @@ assert(!/tennis-ball|hard tennis|硬式テニスボール|フェルト/.test(sou
 assert(!/court-visual|visual-ball|ball-trail|coin-disc|plain-ball/.test(sourceText), "old court or ball visual classes should not return");
 assert(!/A: |B: |C: |出典ランク/.test(sourceText), "source rank should not be shown to beginner users");
 assert(!/試験|模擬/.test(sourceText), "exam wording should not appear in the drill app UI source");
+assert(!/参考にした資料|公式資料・連盟資料を確認して作成|source-list|source-panel/.test(sourceText), "source references should stay out of the app UI");
+assert(!fs.readFileSync(path.join(root, "index.html"), "utf8").includes("sources.js"), "sources.js should not be loaded by the app page");
 
 console.log(`OK: ${questions.length} questions, ${sources.length} sources`);

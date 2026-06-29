@@ -1,9 +1,8 @@
-const CACHE_NAME = "soft-tennis-rule-drill-v1.0.4";
+const CACHE_NAME = "soft-tennis-rule-drill-v1.0.5";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
-  "./sources.js",
   "./questions.js",
   "./app.js",
   "./manifest.webmanifest",

@@ -1,6 +1,6 @@
 {
   "name": "soft-tennis-rule-drill",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": true,
   "description": "ソフトテニスを始めたばかりの子どもと保護者向けに、基本ルールを4択ドリルで確認するスマホ・タブレット向けPWA。",
   "type": "commonjs",

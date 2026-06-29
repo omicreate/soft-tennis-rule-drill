@@ -148,7 +148,7 @@ a {
   transform: rotate(-45deg);
 }
 
-.source-line {
+.app-kicker {
   margin: 0 0 4px;
   display: inline-flex;
   align-items: center;
@@ -159,7 +159,7 @@ a {
   letter-spacing: 0.02em;
 }
 
-.source-line::before {
+.app-kicker::before {
   content: "";
   width: 7px;
   height: 7px;
@@ -544,54 +544,6 @@ h1 {
   color: var(--ink);
 }
 
-.source-list {
-  display: grid;
-  gap: 7px;
-  margin-bottom: 16px;
-}
-
-.source-list a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 13px;
-  border: 1px solid #e4ebf7;
-  border-radius: var(--radius-sm);
-  background: var(--blue-soft);
-  color: #1d4ed8;
-  font-size: 12.5px;
-  font-weight: 700;
-  line-height: 1.45;
-  text-decoration: none;
-}
-
-.source-list a::before {
-  content: "🔗";
-  flex: none;
-  font-size: 12px;
-  filter: grayscale(0.1);
-}
-
-.source-row {
-  display: grid;
-  grid-template-columns: 30px 1fr;
-  gap: 11px;
-  align-items: center;
-  padding: 11px;
-  border: 1px solid #e4ebf7;
-  border-radius: var(--radius-sm);
-  background: var(--blue-soft);
-  color: #1d4ed8;
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.source-list a:hover,
-.source-row:hover {
-  border-color: #cbd9f6;
-}
-
 .primary-action,
 .ghost-action {
   display: inline-flex;
@@ -670,6 +622,61 @@ h1 {
   color: var(--muted);
   font-size: 14px;
   line-height: 1.65;
+}
+
+.complete-panel {
+  display: grid;
+  min-height: 58vh;
+  place-items: center;
+}
+
+.complete-card,
+.motivation-card {
+  width: 100%;
+  padding: 20px;
+  border: 1px solid rgba(14, 157, 98, 0.18);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #ffffff, #f7fcf9);
+  box-shadow: var(--shadow);
+}
+
+.complete-card {
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+
+.complete-card span {
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.complete-card h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.complete-card p,
+.motivation-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.motivation-card {
+  margin: 8px 0 14px;
+}
+
+.motivation-card strong {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--green-dark);
+  font-size: 17px;
+  font-weight: 900;
 }
 
 .rule-update-card {
@@ -773,40 +780,11 @@ h1 {
   font-weight: 800;
 }
 
-.category-card small,
-.source-row small {
+.category-card small {
   color: var(--muted);
   font-size: 11.5px;
   font-weight: 500;
   line-height: 1.45;
-}
-
-.source-panel {
-  display: grid;
-  gap: 8px;
-  margin-top: 22px;
-}
-
-.source-panel h3 {
-  margin-bottom: 2px;
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.source-row span {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--pill);
-  background: linear-gradient(150deg, #16a76c, var(--green-dark));
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.source-row strong {
-  color: #1d4ed8;
 }
 
 .category-bars {
