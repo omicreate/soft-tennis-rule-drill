@@ -1,7 +1,5 @@
 (() => {
   const STORAGE_KEY = "soft-tennis-rule-drill-progress-v1";
-  const EXAM_SIZE = 25;
-  const PASS_LINE = 70;
 
   const questions = globalThis.SOFT_TENNIS_REFEREE_QUESTIONS || [];
   const sources = globalThis.SOFT_TENNIS_REFEREE_SOURCES || [];
@@ -13,7 +11,6 @@
     quizQueue: [],
     currentQuestion: null,
     selectedAnswerId: "",
-    exam: null,
     progress: loadProgress()
   };
 
@@ -27,7 +24,6 @@
       bestStreak: 0,
       totalAnswered: 0,
       totalCorrect: 0,
-      examResults: [],
       lastStudyAt: "",
       reviewQueue: []
     };
@@ -106,47 +102,6 @@
     render();
   }
 
-  function startExam() {
-    state.exam = {
-      status: "active",
-      questions: shuffle(reviewedQuestions()).slice(0, EXAM_SIZE).map(normalizeQuestion),
-      index: 0,
-      answers: {},
-      startedAt: new Date().toISOString(),
-      finishedAt: ""
-    };
-    state.tab = "exam";
-    setActiveTab();
-    render();
-  }
-
-  function answerExam(answerId) {
-    if (!state.exam || state.exam.status !== "active") return;
-    const question = state.exam.questions[state.exam.index];
-    state.exam.answers[question.id] = answerId;
-    if (state.exam.index < state.exam.questions.length - 1) {
-      state.exam.index += 1;
-    } else {
-      finishExam();
-    }
-    render();
-  }
-
-  function finishExam() {
-    const correct = state.exam.questions.filter((question) => state.exam.answers[question.id] === question.answerId);
-    const result = {
-      startedAt: state.exam.startedAt,
-      finishedAt: new Date().toISOString(),
-      questionIds: state.exam.questions.map((question) => question.id),
-      score: Math.round((correct.length / state.exam.questions.length) * 100),
-      categoryBreakdown: categoryStats(state.exam.questions, state.exam.answers)
-    };
-    state.exam.finishedAt = result.finishedAt;
-    state.exam.status = "finished";
-    state.progress.examResults = [result, ...state.progress.examResults].slice(0, 20);
-    saveProgress();
-  }
-
   function categoryStats(questionSet = reviewedQuestions(), answerMap = null) {
     return categories.map((category) => {
       const items = questionSet.filter((question) => question.category === category);
@@ -174,16 +129,12 @@
     return Math.round((mastered / total) * 100);
   }
 
-  function perfectCount() {
-    return state.progress.examResults.filter((result) => result.score === 100).length;
-  }
-
   function updateStatus() {
     const correct = state.progress.totalCorrect;
     const wrong = Math.max(0, state.progress.totalAnswered - correct);
     document.querySelector("#correctValue").textContent = correct;
     document.querySelector("#wrongValue").textContent = wrong;
-    document.querySelector("#perfectValue").textContent = perfectCount();
+    document.querySelector("#streakValue").textContent = state.progress.streak;
   }
 
   function setActiveTab() {
@@ -264,18 +215,31 @@
     `;
   }
 
-  function renderLearn() {
+  function renderReview() {
     const stats = categoryStats();
+    const reviewItems = state.progress.reviewQueue
+      .map((id) => questions.find((question) => question.id === id))
+      .filter(Boolean)
+      .slice(0, 8);
     viewRoot.innerHTML = `
       <section class="learn-panel">
         <div class="section-heading">
-          <h2>学ぶ</h2>
-          <p>むずかしい言葉はあとで確認。まずは場面で覚えよう。</p>
+          <h2>振り返り</h2>
+          <p>間違えた問題と、まだ少ないところを見て、次のドリルにつなげよう。</p>
         </div>
         <div class="rule-update-card">
           <strong>基本ルールの練習用</strong>
           <p>できるだけ正しく作っていますが、大会やその日の決まりで変わることがあります。当日の審判委員・大会要項の指示を優先してください。</p>
         </div>
+        <section class="review-list">
+          <h2>もう一度やる問題</h2>
+          ${
+            reviewItems.length
+              ? reviewItems.map((item) => `<button type="button" data-review="${escapeAttr(item.id)}">${escapeHtml(displayTerm(item))}: ${escapeHtml(displayPrompt(item))}</button>`).join("")
+              : "<p>まだ復習問題はありません。間違えた問題がここに入ります。</p>"
+          }
+        </section>
+        <h3 class="subsection-title">ジャンル別の進み具合</h3>
         <div class="category-grid">
           ${stats
             .map(
@@ -305,85 +269,18 @@
     `;
   }
 
-  function renderExam() {
-    if (!state.exam) {
-      viewRoot.innerHTML = `
-        <section class="exam-panel">
-          <div class="section-heading">
-            <h2>試験モード</h2>
-            <p>${EXAM_SIZE}問をシャッフル。合格目安は${PASS_LINE}%ですが、公式試験の合否基準ではありません。</p>
-          </div>
-          <button class="primary-action wide" id="startExamButton" type="button">模擬試験を始める</button>
-          <div class="mini-note">苦手問題は記録タブとクイズの復習に回ります。</div>
-        </section>
-      `;
-      return;
-    }
-
-    if (state.exam.status === "finished") {
-      const latest = state.progress.examResults[0];
-      viewRoot.innerHTML = `
-        <section class="exam-panel">
-          <div class="result-ring ${latest.score >= PASS_LINE ? "pass" : ""}">
-            <span>${latest.score}%</span>
-            <small>${latest.score >= PASS_LINE ? "目安クリア" : "復習しよう"}</small>
-          </div>
-          <div class="category-bars">
-            ${latest.categoryBreakdown
-              .filter((item) => item.total > 0)
-              .map((item) => `<div class="bar-row">
-                <span>${escapeHtml(displayCategoryName(item.category))}</span>
-                <div><span class="${widthClass(item.rate)}"></span></div>
-                <strong>${item.rate}%</strong>
-              </div>`)
-              .join("")}
-          </div>
-          <button class="primary-action wide" id="startExamButton" type="button">もう一度シャッフル</button>
-        </section>
-      `;
-      return;
-    }
-
-    const question = state.exam.questions[state.exam.index];
-    viewRoot.innerHTML = `
-      <section class="quiz-panel exam-active">
-        <div class="quiz-meta">
-          <span>試験</span>
-          <strong>${state.exam.index + 1}/${state.exam.questions.length}</strong>
-        </div>
-        ${renderCourtIllustration(question)}
-        <div class="question-card">
-          <p class="question-id">ことば: ${escapeHtml(displayTerm(question))}</p>
-          <h2>${escapeHtml(displayPrompt(question))}</h2>
-          <p class="question-helper">試験と同じつもりで、あわてず選ぼう。</p>
-          <div class="choice-list">
-            ${question.choices
-              .map((choice, index) => `<button class="choice-button" type="button" data-exam-answer="${escapeAttr(choice.id)}">
-                <span class="choice-number">${index + 1}</span>
-                <span>${escapeHtml(displayChoiceText(choice.text))}</span>
-              </button>`)
-              .join("")}
-          </div>
-        </div>
-      </section>
-    `;
-  }
-
   function renderRecord() {
     const total = state.progress.totalAnswered || 0;
     const accuracy = total ? Math.round((state.progress.totalCorrect / total) * 100) : 0;
     const stats = categoryStats();
-    const reviewItems = state.progress.reviewQueue
-      .map((id) => questions.find((question) => question.id === id))
-      .filter(Boolean)
-      .slice(0, 8);
     viewRoot.innerHTML = `
       <section class="record-panel">
         <div class="record-summary">
           <div><span>回答数</span><strong>${total}</strong></div>
           <div><span>正答率</span><strong>${accuracy}%</strong></div>
-          <div><span>習熟度</span><strong>${masteryRate()}%</strong></div>
+          <div><span>最高連続</span><strong>${state.progress.bestStreak}</strong></div>
         </div>
+        <div class="mini-note">習熟度 ${masteryRate()}% / 最終学習 ${escapeHtml(formatStudyDate(state.progress.lastStudyAt))}</div>
         <div class="category-bars">
           ${stats
             .map((item) => `<div class="bar-row">
@@ -393,14 +290,6 @@
             </div>`)
             .join("")}
         </div>
-        <section class="review-list">
-          <h2>復習リスト</h2>
-          ${
-            reviewItems.length
-              ? reviewItems.map((item) => `<button type="button" data-review="${escapeAttr(item.id)}">${escapeHtml(item.officialTerm)}: ${escapeHtml(displayPrompt(item))}</button>`).join("")
-              : "<p>まだ復習問題はありません。間違えた問題がここに入ります。</p>"
-          }
-        </section>
         <button class="ghost-action wide" id="resetProgressButton" type="button">学習記録をリセット</button>
       </section>
     `;
@@ -409,9 +298,8 @@
   function render() {
     updateStatus();
     setActiveTab();
-    if (state.tab === "learn") renderLearn();
+    if (state.tab === "review") renderReview();
     if (state.tab === "quiz") renderQuiz();
-    if (state.tab === "exam") renderExam();
     if (state.tab === "record") renderRecord();
   }
 
@@ -521,7 +409,14 @@
   }
 
   function stripScenarioPrefix(text) {
-    return String(text || "").replace(/^(試験前の確認|実際の試合で|もう一度確認|初心者へ説明するなら|模擬試験):\s*/, "");
+    return String(text || "").replace(/^(ドリル|実際の試合で|もう一度確認|初心者へ説明するなら|振り返り):\s*/, "");
+  }
+
+  function formatStudyDate(value) {
+    if (!value) return "まだありません";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "まだありません";
+    return `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   }
 
   function displayCategoryName(category) {
@@ -654,18 +549,6 @@
       nextQuestion();
       state.tab = "quiz";
       render();
-      return;
-    }
-
-    const startExamButton = event.target.closest("#startExamButton");
-    if (startExamButton) {
-      startExam();
-      return;
-    }
-
-    const examAnswerButton = event.target.closest("[data-exam-answer]");
-    if (examAnswerButton) {
-      answerExam(examAnswerButton.dataset.examAnswer);
       return;
     }
 

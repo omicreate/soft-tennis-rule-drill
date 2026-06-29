@@ -113,11 +113,11 @@
   // ルール上ありえない設問が生成されてしまうため、役割を断定しない中立表現にする。
   // 役割固有の設問は、各 base question 側で正しい役割を明記して扱う。
   const scenarioPrefixes = [
-    "試験前の確認:",
+    "ドリル:",
     "実際の試合で:",
     "もう一度確認:",
     "初心者へ説明するなら:",
-    "模擬試験:"
+    "振り返り:"
   ];
 
   function q(id, category, prompt, choices, answerIndex, officialTerm, plainExplanation, tag, sourceRefs, effectiveFrom, scopeNote) {

@@ -1,8 +1,8 @@
 {
   "name": "soft-tennis-rule-drill",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
-  "description": "ソフトテニスのルール、審判コール、公式用語を4択で学ぶスマホ向けPWA。",
+  "description": "ソフトテニスのルール、審判コール、公式用語を4択ドリルで学ぶスマホ向けPWA。",
   "type": "commonjs",
   "scripts": {
     "test": "node --check sources.js && node --check questions.js && node --check app.js && node --check sw.js && node tests/data.test.js"

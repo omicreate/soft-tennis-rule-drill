@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-title" content="ルールドリル" />
     <meta
       name="description"
-      content="小学生・中学生向けに、ソフトテニスの審判コール、ルール、2026年コイントス運用、ヒートルールを4択で学べるスマホ向けPWA。"
+      content="小学生・中学生向けに、ソフトテニスの審判コールと基本ルールを4択ドリルで学べるスマホ向けPWA。"
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ソフテニルールドリル" />
@@ -64,25 +64,21 @@
           <strong id="wrongValue" class="stat-wrong">0</strong>
         </div>
         <div>
-          <span class="status-label">満点</span>
-          <strong id="perfectValue" class="stat-perfect">0</strong>
+          <span class="status-label">連続</span>
+          <strong id="streakValue" class="stat-streak">0</strong>
         </div>
       </section>
 
       <section id="viewRoot" class="view-root" aria-live="polite"></section>
 
       <nav class="bottom-nav" aria-label="表示切替">
-        <button class="nav-button" data-tab="learn" type="button">
-          <span class="nav-icon book-icon" aria-hidden="true"></span>
-          <span>学ぶ</span>
-        </button>
         <button class="nav-button active" data-tab="quiz" type="button">
           <span class="nav-icon quiz-icon" aria-hidden="true"></span>
-          <span>クイズ</span>
+          <span>ドリル</span>
         </button>
-        <button class="nav-button" data-tab="exam" type="button">
-          <span class="nav-icon board-icon" aria-hidden="true"></span>
-          <span>試験</span>
+        <button class="nav-button" data-tab="review" type="button">
+          <span class="nav-icon book-icon" aria-hidden="true"></span>
+          <span>振り返り</span>
         </button>
         <button class="nav-button" data-tab="record" type="button">
           <span class="nav-icon bars-icon" aria-hidden="true"></span>
