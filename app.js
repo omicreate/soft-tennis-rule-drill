@@ -228,14 +228,15 @@
     viewRoot.innerHTML = `
       <section class="quiz-panel">
         <div class="quiz-meta">
-          <span>${escapeHtml(question.category)}</span>
+          <span>問題</span>
           <strong>${escapeHtml(progressText)}</strong>
         </div>
         <div class="progress-track"><span class="${widthClass(Math.min(100, (state.progress.totalAnswered % reviewedQuestions().length) / reviewedQuestions().length * 100))}"></span></div>
         ${renderCourtIllustration(question)}
         <div class="question-card">
-          <p class="question-id">${escapeHtml(question.id)} / ${escapeHtml(question.sourceRank)}ランク</p>
-          <h2>${escapeHtml(question.prompt)}</h2>
+          <p class="question-id">ことば: ${escapeHtml(displayTerm(question))}</p>
+          <h2>${escapeHtml(displayPrompt(question))}</h2>
+          <p class="question-helper">場面を思いうかべて、いちばん正しいものをえらぼう。</p>
           <div class="choice-list">
             ${question.choices
               .map((choice, index) => {
@@ -243,7 +244,7 @@
                 const wrongClass = selected === choice.id && choice.id !== question.answerId ? "wrong" : "";
                 return `<button class="choice-button ${correctClass} ${wrongClass}" type="button" data-answer="${escapeAttr(choice.id)}" ${selected ? "disabled" : ""}>
                   <span class="choice-number">${index + 1}</span>
-                  <span>${escapeHtml(choice.text)}</span>
+                  <span>${escapeHtml(displayChoiceText(choice.text))}</span>
                 </button>`;
               })
               .join("")}
@@ -257,7 +258,7 @@
                 <div class="source-list">${sourceLinks(question)}</div>
                 <button class="primary-action" id="nextQuestionButton" type="button">次の問題へ</button>
               </section>`
-            : `<p class="hint-line">選択肢をタップすると、公式用語と短い解説が出ます。</p>`
+            : `<p class="hint-line">選ぶと、正しいことばと短い説明が出ます。</p>`
         }
       </section>
     `;
@@ -269,25 +270,25 @@
       <section class="learn-panel">
         <div class="section-heading">
           <h2>学ぶ</h2>
-          <p>公式用語を先に見てから、4択で確認できます。</p>
+          <p>むずかしい言葉はあとで確認。まずは場面で覚えよう。</p>
         </div>
         <div class="rule-update-card">
-          <strong>2026年コイントス運用を反映</strong>
-          <p>JSTA公式トピックスと連盟資料を分けて管理。大会ごとの競技上の注意は必ず確認する前提です。</p>
+          <strong>試合前のトスも確認</strong>
+          <p>2026年からのコイントス運用も、公式資料・連盟資料を確認して入れています。</p>
         </div>
         <div class="category-grid">
           ${stats
             .map(
               (item) => `<button class="category-card" type="button" data-category="${escapeAttr(item.category)}">
-                <span>${escapeHtml(item.category)}</span>
+                <span>${escapeHtml(displayCategoryName(item.category))}</span>
                 <strong>${item.correct}/${item.total}</strong>
-                <small>確認済み ${item.total}問</small>
+                <small>${escapeHtml(displayCategoryHint(item.category))}</small>
               </button>`
             )
             .join("")}
         </div>
         <section class="source-panel">
-          <h3>出典ランク</h3>
+          <h3>参考にした資料</h3>
           ${sources
             .map(
               (source) => `<a href="${escapeAttr(source.url)}" target="_blank" rel="noreferrer" class="source-row">
@@ -331,7 +332,7 @@
             ${latest.categoryBreakdown
               .filter((item) => item.total > 0)
               .map((item) => `<div class="bar-row">
-                <span>${escapeHtml(item.category)}</span>
+                <span>${escapeHtml(displayCategoryName(item.category))}</span>
                 <div><span class="${widthClass(item.rate)}"></span></div>
                 <strong>${item.rate}%</strong>
               </div>`)
@@ -347,18 +348,19 @@
     viewRoot.innerHTML = `
       <section class="quiz-panel exam-active">
         <div class="quiz-meta">
-          <span>模擬試験</span>
+          <span>試験</span>
           <strong>${state.exam.index + 1}/${state.exam.questions.length}</strong>
         </div>
         ${renderCourtIllustration(question)}
         <div class="question-card">
-          <p class="question-id">${escapeHtml(question.category)}</p>
-          <h2>${escapeHtml(question.prompt)}</h2>
+          <p class="question-id">ことば: ${escapeHtml(displayTerm(question))}</p>
+          <h2>${escapeHtml(displayPrompt(question))}</h2>
+          <p class="question-helper">試験と同じつもりで、あわてず選ぼう。</p>
           <div class="choice-list">
             ${question.choices
               .map((choice, index) => `<button class="choice-button" type="button" data-exam-answer="${escapeAttr(choice.id)}">
                 <span class="choice-number">${index + 1}</span>
-                <span>${escapeHtml(choice.text)}</span>
+                <span>${escapeHtml(displayChoiceText(choice.text))}</span>
               </button>`)
               .join("")}
           </div>
@@ -385,7 +387,7 @@
         <div class="category-bars">
           ${stats
             .map((item) => `<div class="bar-row">
-              <span>${escapeHtml(item.category)}</span>
+              <span>${escapeHtml(displayCategoryName(item.category))}</span>
               <div><span class="${widthClass(item.rate)}"></span></div>
               <strong>${item.rate}%</strong>
             </div>`)
@@ -395,7 +397,7 @@
           <h2>復習リスト</h2>
           ${
             reviewItems.length
-              ? reviewItems.map((item) => `<button type="button" data-review="${escapeAttr(item.id)}">${escapeHtml(item.officialTerm)}: ${escapeHtml(item.prompt)}</button>`).join("")
+              ? reviewItems.map((item) => `<button type="button" data-review="${escapeAttr(item.id)}">${escapeHtml(item.officialTerm)}: ${escapeHtml(displayPrompt(item))}</button>`).join("")
               : "<p>まだ復習問題はありません。間違えた問題がここに入ります。</p>"
           }
         </section>
@@ -420,6 +422,199 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#39;");
+  }
+
+  function displayPrompt(question) {
+    const baseText = stripScenarioPrefix(question.prompt);
+    const normalized = baseText
+      .replace("一般的に", "")
+      .replace("自然なのは？", "どれ？")
+      .replace("近いものは？", "どれ？")
+      .replace("近い扱いは？", "どうなる？")
+      .replace("確認したい扱いは？", "どう考える？")
+      .replace("関係する用語は？", "この名前は？")
+      .replace("意識することは？", "気をつけることは？")
+      .replace("よい対応は？", "どうするとよい？")
+      .replace("よい態度は？", "どうするとよい？")
+      .replace("改善としてよいものは？", "どう直す？")
+      .replace("主なコールは？", "何とコールする？")
+      .replace("どう扱う？", "どうなる？");
+
+    const easyPrompts = {
+      "通常ゲームで、先に4ポイントを取り2ポイント差がついた。どうなる？":
+        "4ポイントを取って、相手より2ポイント多くなりました。どうなる？",
+      "ファイナルゲームで目安になる先取ポイントは？":
+        "ファイナルゲームは、まず何ポイントを目指す？",
+      "ポイントが同点でゲーム終盤に追いついた場面。審判が特に確認したいことは？":
+        "ゲームの終わりごろで同点です。審判は何を確認する？",
+      "7ゲームマッチで勝敗が決まるゲーム取得数は？":
+        "7ゲームマッチは、何ゲーム取ると勝ち？",
+      "5ゲームマッチで勝敗が決まるゲーム取得数は？":
+        "5ゲームマッチは、何ゲーム取ると勝ち？",
+      "得点後に次のサービスへ進む前、主審が確認することは？":
+        "1点が終わりました。次のサービス前に何を確認する？",
+      "サービスがネットに当たって正しいサービスコートに入った。一般的なコールは？":
+        "サーブがネットに当たって、正しい場所に入りました。何とコールする？",
+      "第1サービスが正しく入らなかった。次は？":
+        "1本目のサーブが入りませんでした。次はどうする？",
+      "第1サービス、第2サービスとも正しく入らなかった。どうなる？":
+        "サーブを2本とも失敗しました。どうなる？",
+      "プレー中、別コートのボールが入ってきて危険。主審の対応は？":
+        "プレー中に、となりのコートからボールが入ってきました。どうする？",
+      "サービスレットとノーカウントの違いとしてどれ？":
+        "「レット」と「ノーカウント」のちがいはどれ？",
+      "プレー中に審判のコールが明らかに選手のプレーを止めさせた。どう考える？":
+        "審判の声で、選手がプレーを止めてしまいました。どう考える？",
+      "サービスがネットに触れ、正しいサービスコートに入らなかった。どうなる？":
+        "サーブがネットに当たり、正しい場所に入りませんでした。どうなる？",
+      "隣のコートから声が聞こえたが、プレーに影響していない。毎回ノーカウントにする？":
+        "となりの声が聞こえました。でもプレーには関係なさそうです。毎回やり直す？",
+      "やり直しの判断で大切なことは？":
+        "やり直しにするか迷った時、何を大切にする？",
+      "ノーカウント後の説明としてどれ？":
+        "ノーカウントになったら、どう説明する？",
+      "サービスレットのあと、基本的に何をする？":
+        "サービスレットのあとは、どうする？",
+      "打ったボールが相手コートに入らず、ラインの外に落ちた。何とコールする？":
+        "打ったボールがラインの外に落ちました。何とコールする？",
+      "ボールが地面に2回バウンドしてから返球した。この名前は？":
+        "ボールが2回バウンドしてから返しました。この名前は？",
+      "プレー中に選手の身体や衣服にボールが触れた。この名前は？":
+        "プレー中、ボールが体や服に当たりました。この名前は？",
+      "選手やラケットがプレー中にネットへ触れた。この名前は？":
+        "プレー中、体やラケットがネットにさわりました。この名前は？",
+      "相手のプレーを妨げる行為にこの名前は？":
+        "相手のプレーをじゃました時の名前は？",
+      "ラケットや体がネットを越えて、相手コート側でボールを打った。この名前は？":
+        "ネットをこえて、相手側でボールを打ちました。この名前は？",
+      "ボールがラインに少しでも触れているように見える。判定としてどれ？":
+        "ボールがラインに少しでもさわって見えました。判定は？",
+      "判定を訂正する必要がある時、どうするとよい？":
+        "判定をまちがえたと気づいたら、どうする？",
+      "審判の声が小さい時、どう直す？":
+        "審判の声が小さくて聞こえません。どう直す？",
+      "副審が担当ラインでアウトを確認した。基本の役割は？":
+        "副審がアウトを見ました。副審はどうする？",
+      "判定の声と動作が食い違うとどうなる？":
+        "声と手の合図がちがうと、どうなる？",
+      "試合開始前に主審が確認したいものは？":
+        "試合を始める前、主審は何を確認する？",
+      "ゲームが終わった後、次に気をつけることは？":
+        "ゲームが終わりました。次に何を確認する？",
+      "試合前のトスで決める内容としてどれ？":
+        "試合前のトスでは、何を決める？",
+      "2026年4月7日のJSTA公式案内で導入が示された試合前の方法は？":
+        "2026年の案内で、試合前に使うとされた方法は？",
+      "JSTA公式案内で、今後コイントスを実施すると示されている大会は？":
+        "JSTAの案内では、どの大会でコイントスを行う？",
+      "JSTA公式案内で、都道府県連盟へのコイントス運用はどう示されている？":
+        "都道府県連盟にも、コイントスをどうしてほしいと案内している？",
+      "ヒートルールが採用されると、ファイナルゲームに入る前に認められる休息は何分間？":
+        "暑い日のヒートルール。ファイナルゲーム前の休みは何分？",
+      "ヒートルール採用の目安となる、大会当日の気温は？":
+        "ヒートルールの目安になる気温は？",
+      "気温が測れない時、ヒートルールの目安にする暑さ指数（WBGT）の値は？":
+        "気温が測れない時、WBGTはいくつ以上が目安？"
+    };
+
+    return easyPrompts[normalized] || normalized;
+  }
+
+  function stripScenarioPrefix(text) {
+    return String(text || "").replace(/^(試験前の確認|実際の試合で|もう一度確認|初心者へ説明するなら|模擬試験):\s*/, "");
+  }
+
+  function displayCategoryName(category) {
+    const names = {
+      "スコア": "点数",
+      "サービス/レシーブ": "サーブとレシーブ",
+      "レット/ノーカウント": "やり直し",
+      "失ポイント": "相手の点になる時",
+      "コール": "審判の声",
+      "試合進行": "試合の進め方",
+      "禁止事項/マナー": "やってはいけないこと",
+      "採点票・審判動作": "記録と合図",
+      "2026年コイントス運用": "試合前のトス",
+      "ヒートルール": "暑い日のルール"
+    };
+    return names[category] || category;
+  }
+
+  function displayCategoryHint(category) {
+    const hints = {
+      "スコア": "カウントやゲーム",
+      "サービス/レシーブ": "サーブ前後の確認",
+      "レット/ノーカウント": "もう一度やる場面",
+      "失ポイント": "ミスや反則の場面",
+      "コール": "声の出し方",
+      "試合進行": "始め方・進め方",
+      "禁止事項/マナー": "安全とフェアプレー",
+      "採点票・審判動作": "書き方と手の合図",
+      "2026年コイントス運用": "コイントスの確認",
+      "ヒートルール": "暑い日の休み方"
+    };
+    return hints[category] || "確認問題";
+  }
+
+  function displayTerm(question) {
+    const easyTerms = {
+      "ポイントカウント": "点数",
+      "試合進行": "試合の進め方",
+      "ライン判定": "ラインの判定",
+      "サービス順": "サーブの順番",
+      "ネットタッチ": "ネットにさわる",
+      "ネットオーバー": "ネットをこえる",
+      "審判動作": "審判の合図",
+      "採点票": "記録用紙",
+      "適用大会": "使う大会",
+      "順次適用": "少しずつ使う",
+      "大会要項": "大会のきまり",
+      "公平な進行": "公平に進める",
+      "気温基準": "気温の目安",
+      "休息場所": "休む場所"
+    };
+    return easyTerms[question.officialTerm] || question.officialTerm;
+  }
+
+  function displayChoiceText(text) {
+    const replacements = {
+      "そのゲームを取得": "そのゲームの勝ち",
+      "もう1ポイント行う": "もう1点行う",
+      "ファイナルゲームに入る": "ファイナルゲームへ進む",
+      "次の1点で終わるか、差が必要か": "次の1点で終わるか確認",
+      "必ずサイドを交替するか": "必ずサイドを替える",
+      "試合を最初からやり直すか": "試合をはじめからやり直す",
+      "両者に聞こえる声で正しく伝える": "両方に聞こえる声で言う",
+      "進行を止めて確認する": "いったん止めて確認する",
+      "勘で続ける": "なんとなく続ける",
+      "カウント、サーバー、レシーバー": "カウント・サーバー・レシーバー",
+      "第2サービスを行う": "2本目のサーブをする",
+      "ただちに失ポイント": "すぐ相手の点",
+      "ダブルフォールトで失ポイント": "ダブルフォールトで相手の点",
+      "正しいレシーブ順と位置を確認する": "正しい順番と位置を確認する",
+      "聞こえるように再度コールする": "聞こえる声でもう一度言う",
+      "ライン付近のイン・アウト": "ラインの近くのイン・アウト",
+      "準備が整ってから進める": "準備できてから始める",
+      "気づいた時点で確認する": "気づいたらすぐ確認する",
+      "プレーを止めてノーカウントにする": "止めて、やり直しにする",
+      "サービスのやり直しか、ポイント全体のやり直しか": "サーブだけか、ポイント全部か",
+      "ノーカウントの可能性": "ノーカウントか確認する",
+      "公平性と安全性を保つこと": "公平さと安全を守ること",
+      "そのポイントは数えず、状況を戻して再開する": "その点は数えず、戻して再開",
+      "該当するサービスをやり直す": "そのサーブをやり直す",
+      "イン側として扱う": "インにする",
+      "主審へ判定を示して補助する": "主審に判定を知らせる",
+      "プレーを止める意思を明確にする": "止めることをはっきり伝える",
+      "次のサーバーが分かるように進める": "次にだれがサーブか分かるようにする",
+      "落ち着いて訂正し、理由を簡潔に示す": "落ち着いて直し、短く説明する",
+      "短い言葉をはっきり出す": "短く、はっきり言う",
+      "サービス、レシーブ、サイドの選択": "サーブ・レシーブ・サイド",
+      "サービス・レシーブ・サイドの選択": "サーブ・レシーブ・サイド",
+      "大会要項・競技上の注意": "大会のきまりや注意",
+      "両者に分かるよう公平に行う": "両方に見えるよう公平に行う",
+      "選択内容を確認して試合開始につなげる": "選んだ内容を確認して始める"
+    };
+    return replacements[text] || text;
   }
 
   function widthClass(percent) {

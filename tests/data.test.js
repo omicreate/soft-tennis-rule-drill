@@ -71,6 +71,6 @@ const sourceText = ["index.html", "styles.css", "app.js", "questions.js"]
   .join("\n");
 
 assert(!sourceText.includes("🎾"), "hard-tennis-style tennis ball emoji must not be used");
-assert(!/tennis-ball|hard tennis|フェルト/.test(sourceText), "hard tennis ball wording should not appear in UI source");
+assert(!/tennis-ball|hard tennis|硬式テニスボール|フェルト/.test(sourceText), "hard tennis ball wording should not appear in UI source");
 
 console.log(`OK: ${questions.length} questions, ${sources.length} sources`);

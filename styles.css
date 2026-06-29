@@ -428,6 +428,14 @@ h1 {
   letter-spacing: 0.005em;
 }
 
+.question-helper {
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .choice-list {
   display: grid;
   gap: 9px;
