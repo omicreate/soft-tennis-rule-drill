@@ -292,6 +292,7 @@
           <p>${escapeHtml(setCompleteMessage())}</p>
           <button class="primary-action wide" id="startNextSetButton" type="button">次の10問へ</button>
           <button class="ghost-action wide" id="goReviewButton" type="button">振り返りを見る</button>
+          <p class="social-cta"><a href="https://www.instagram.com/softtennis_iq/" target="_blank" rel="noopener noreferrer">実戦の局面判断もクイズで鍛えたいなら「ソフトテニスIQ｜局面クイズ」</a></p>
         </div>
       </section>
     `;

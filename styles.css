@@ -652,6 +652,17 @@ h1 {
   font-weight: 800;
 }
 
+.social-cta {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted, #6b8093);
+}
+
+.social-cta a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 .complete-card h2 {
   margin: 0;
   color: var(--ink);
