@@ -1,7 +1,7 @@
 // 面別リンク遷移の計測（?src= が付いているときだけ1回送る／2026-07-29 設計=ナオ）
 // CSPが script-src 'self' のため外部ファイルにしている。インラインだと実行されない。
 (function () {
-  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbx9M9j1Ad8mkVZKUcRd7ceg8v_IKhdpewRBzrp4Itf-9lBZPELdSSEf59MhuYzS4RtR/exec';
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxdPOPn6aUE3yhlCWt_qadU6POkEkxYXN3qxLsdcel-FWJFa_Fmu4NjL7P_jcrLew4/exec';
   var APP = 'soft-tennis-rule-drill';
   try {
     var src = new URLSearchParams(location.search).get('src');
