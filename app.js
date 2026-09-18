@@ -12,6 +12,7 @@
     drillIndex: 0,
     setCorrect: 0,
     setFinished: false,
+    drillCategory: "",
     currentQuestion: null,
     selectedAnswerId: "",
     progress: loadProgress()
@@ -69,6 +70,7 @@
 
   function startDrillSet(category = "") {
     const set = buildDrillSet(category);
+    state.drillCategory = category;
     state.drillSet = set.map((question) => question.id);
     state.drillIndex = 0;
     state.setCorrect = 0;
@@ -172,6 +174,9 @@
       .slice(0, reviewedQuestions().length);
     saveProgress();
     render();
+    requestAnimationFrame(() => {
+      document.querySelector(".answer-card")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
   }
 
   function categoryStats(questionSet = reviewedQuestions(), answerMap = null) {
@@ -211,14 +216,16 @@
 
   function setActiveTab() {
     navButtons.forEach((button) => {
-      button.classList.toggle("active", button.dataset.tab === state.tab);
+      const active = button.dataset.tab === state.tab;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
     });
   }
 
-  function renderCourtIllustration(question) {
+  function renderCourtIllustration(question, compact = false) {
     const coinMode = question?.category === "2026年コイントス運用";
     return `
-      <div class="drill-visual ${coinMode ? "coin-mode" : ""}" aria-hidden="true">
+      <div class="drill-visual ${coinMode ? "coin-mode" : ""} ${compact ? "is-compact" : ""}" aria-hidden="true">
         <div class="visual-board">
           <span class="visual-chip">4択</span>
           <strong>${coinMode ? "試合前の確認" : "基本ルール"}</strong>
@@ -245,14 +252,20 @@
     const isCorrect = selected && selected === question.answerId;
     const progressText = `${state.drillIndex + 1}/${state.drillSet.length}`;
     const progressRate = ((state.drillIndex + (selected ? 1 : 0)) / state.drillSet.length) * 100;
+    const isFirstVisit = state.progress.totalAnswered === 0 && !selected;
+    const setLabel = state.drillSet.length === 1
+      ? "もう一度"
+      : state.drillCategory
+        ? displayCategoryName(state.drillCategory)
+        : "今日のセット";
     viewRoot.innerHTML = `
       <section class="quiz-panel">
         <div class="quiz-meta">
-          <span>今日のセット</span>
+          <span>${escapeHtml(setLabel)}</span>
           <strong>${escapeHtml(progressText)}</strong>
         </div>
         <div class="progress-track"><span class="${widthClass(progressRate)}"></span></div>
-        ${renderCourtIllustration(question)}
+        ${renderCourtIllustration(question, Boolean(selected))}
         <div class="question-card">
           <p class="question-id">ことば: ${escapeHtml(displayTerm(question))}</p>
           <h2>${escapeHtml(displayPrompt(question))}</h2>
@@ -277,7 +290,7 @@
                 <p><b>${escapeHtml(question.officialTerm)}</b> / ${escapeHtml(question.plainExplanation)}</p>
                 <button class="primary-action" id="nextQuestionButton" type="button">${state.drillIndex >= state.drillSet.length - 1 ? "結果を見る" : "次の問題へ"}</button>
               </section>`
-            : `<p class="hint-line">選ぶと、正しいことばと短い説明が出ます。</p>`
+            : `<p class="hint-line">${isFirstVisit ? "10問セットです。選ぶと短い説明が出て、まちがいは振り返りに残ります。" : "選ぶと、正しいことばと短い説明が出ます。"}</p>`
         }
       </section>
     `;
@@ -287,6 +300,10 @@
     viewRoot.innerHTML = `
       <section class="complete-panel">
         <div class="complete-card">
+          <div class="complete-visual" aria-hidden="true">
+            <span class="complete-mark">✓</span>
+            <span class="complete-chip">ルールカード</span>
+          </div>
           <span>1セット完了</span>
           <h2>${state.setCorrect}/${state.drillSet.length} 正解</h2>
           <p>${escapeHtml(setCompleteMessage())}</p>
@@ -314,7 +331,11 @@
           <h2>もう一度やる問題</h2>
           ${
             reviewItems.length
-              ? reviewItems.map((item) => `<button type="button" data-review="${escapeAttr(item.id)}">${escapeHtml(displayTerm(item))}: ${escapeHtml(displayPrompt(item))}</button>`).join("")
+              ? reviewItems.map((item) => `<button type="button" class="review-item" data-review="${escapeAttr(item.id)}">
+                  <span class="review-term">${escapeHtml(displayTerm(item))}</span>
+                  <span class="review-prompt">${escapeHtml(displayPrompt(item))}</span>
+                  <span class="review-action">もう一度</span>
+                </button>`).join("")
               : "<p>まだ復習問題はありません。間違えた問題がここに入ります。</p>"
           }
         </section>
@@ -325,7 +346,7 @@
               (item) => `<button class="category-card" type="button" data-category="${escapeAttr(item.category)}">
                 <span>${escapeHtml(displayCategoryName(item.category))}</span>
                 <strong>${item.correct}/${item.total}</strong>
-                <small>${escapeHtml(displayCategoryHint(item.category))}</small>
+                <small>このジャンルで10問 · ${escapeHtml(displayCategoryHint(item.category))}</small>
               </button>`
             )
             .join("")}
@@ -349,7 +370,7 @@
           <div><span>正答率</span><strong>${accuracy}%</strong></div>
           <div><span>最高連続</span><strong>${state.progress.bestStreak}</strong></div>
         </div>
-        <div class="mini-note">習熟度 ${masteryRate()}% / 最終学習 ${escapeHtml(formatStudyDate(state.progress.lastStudyAt))}</div>
+        <div class="mini-note">習熟度 ${masteryRate()}% / 最終学習 ${escapeHtml(formatStudyDate(state.progress.lastStudyAt))}。記録はこの端末だけに残ります。</div>
         <div class="category-bars">
           ${stats
             .map((item) => `<div class="bar-row">
@@ -664,6 +685,7 @@
         state.drillIndex = 0;
         state.setCorrect = 0;
         state.setFinished = false;
+        state.drillCategory = "";
         state.currentQuestion = normalizeQuestion(question);
         state.selectedAnswerId = "";
         state.tab = "quiz";
