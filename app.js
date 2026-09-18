@@ -175,7 +175,7 @@
     saveProgress();
     render();
     requestAnimationFrame(() => {
-      document.querySelector(".answer-card")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      document.querySelector("#nextQuestionButton")?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   }
 
@@ -346,7 +346,7 @@
               (item) => `<button class="category-card" type="button" data-category="${escapeAttr(item.category)}">
                 <span>${escapeHtml(displayCategoryName(item.category))}</span>
                 <strong>${item.correct}/${item.total}</strong>
-                <small>このジャンルで10問 · ${escapeHtml(displayCategoryHint(item.category))}</small>
+                <small>10問する · ${escapeHtml(displayCategoryHint(item.category))}</small>
               </button>`
             )
             .join("")}

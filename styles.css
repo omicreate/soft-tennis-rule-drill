@@ -289,8 +289,8 @@ h1 {
   grid-template-columns: 1.1fr 0.9fr;
   gap: 14px;
   align-items: center;
-  min-height: 168px;
-  padding: 18px;
+  min-height: 132px;
+  padding: 14px 16px;
   overflow: hidden;
   border-radius: var(--radius) var(--radius) 0 0;
   background:
@@ -381,7 +381,7 @@ h1 {
 
 .visual-choice-list span {
   display: block;
-  height: 20px;
+  height: 16px;
   border-radius: var(--pill);
   background: rgba(255, 255, 255, 0.55);
 }
@@ -573,8 +573,9 @@ h1 {
   line-height: 1.7;
 }
 
-.answer-card p b {
-  color: var(--ink);
+.answer-card .primary-action {
+  width: 100%;
+  margin-top: 2px;
 }
 
 .primary-action,
