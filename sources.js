@@ -7,8 +7,18 @@
       publisher: "公益財団法人 日本ソフトテニス連盟",
       url: "https://www.jsta.or.jp/judge_tech",
       publishedAt: "2026-04-01",
-      checkedAt: "2026-09-18",
+      checkedAt: "2026-09-19",
       scopeNote: "競技規則・審判規則の用語と進行の確認。公式文章や図表は転載せず、子どもと保護者向けの自作問題に変換。"
+    },
+    {
+      id: "jsta-rule-revision-2026",
+      rank: "B",
+      title: "「競技規則」「審判規則」「大会運営規則」の改訂について",
+      publisher: "公益財団法人 日本ソフトテニス連盟（各連盟周知資料）",
+      url: "https://www.soft-tennis.com/kouchi/osirase/2026%E3%83%AB%E3%83%BC%E3%83%AB%E6%94%B9%E8%A8%82/2026kaitei-syousai.pdf",
+      publishedAt: "2026-04-01",
+      checkedAt: "2026-09-19",
+      scopeNote: "2026年4月1日施行の改訂対照の確認。公式文章は転載せず、用語と改定点の裏取りに使用。"
     },
     {
       id: "jsta-judge-tech",
@@ -17,17 +27,17 @@
       publisher: "公益財団法人 日本ソフトテニス連盟",
       url: "https://www.jsta.or.jp/judge_tech",
       publishedAt: "",
-      checkedAt: "2026-09-18",
+      checkedAt: "2026-09-19",
       scopeNote: "審判資料、ルールブック案内、ジュニア審判マニュアル等の入口。"
     },
     {
       id: "jsta-heat-rule",
-      rank: "A",
+      rank: "B",
       title: "ヒートルールの運用について",
       publisher: "公益財団法人 日本ソフトテニス連盟",
       url: "https://www.jsta.or.jp/news/2021/07/13688.html",
       publishedAt: "2021-07",
-      checkedAt: "2026-09-18",
+      checkedAt: "2026-09-19",
       scopeNote: "2021年の暑熱対策案内。2026年4月1日施行のルールブック第46条では、暑さ指数（WBGT）を原則の目安とする。"
     },
     {
@@ -37,7 +47,7 @@
       publisher: "公益財団法人 日本ソフトテニス連盟",
       url: "https://www.jsta.or.jp/topics/2026/04/19569.html",
       publishedAt: "2026-04-07",
-      checkedAt: "2026-09-18",
+      checkedAt: "2026-09-19",
       scopeNote: "JSTA主催大会でのコイントス導入と都道府県連盟への順次適用依頼。"
     },
     {
@@ -47,7 +57,7 @@
       publisher: "兵庫県ソフトテニス連盟",
       url: "https://softtennis-hyogo.com/2026/05/02/%E3%82%B3%E3%82%A4%E3%83%B3%E3%83%88%E3%82%B9%E3%81%AE%E6%89%8B%E9%A0%86/",
       publishedAt: "2026-05-02",
-      checkedAt: "2026-09-18",
+      checkedAt: "2026-09-19",
       scopeNote: "日本連盟、西日本連盟、近畿連盟主催大会におけるコイントス手順の補助確認。"
     },
     {
@@ -57,7 +67,7 @@
       publisher: "長野市ソフトテニス協会",
       url: "https://nagano-city-sta.com/wp-content/uploads/2026/02/ca90a6b5ce7d25d868c1b7f1d5f874dc.pdf",
       publishedAt: "2026-02",
-      checkedAt: "2026-09-18",
+      checkedAt: "2026-09-19",
       scopeNote: "ラケット公認マーク廃止後の国内大会運用とコイントス使用の補助確認。"
     },
     {
@@ -67,7 +77,7 @@
       publisher: "静岡県ソフトテニス連盟",
       url: "https://www.soft-tennis.com/shizuoka/left/l10_record/20260314_26-1jyoninrijikaigijiroku.pdf",
       publishedAt: "2026-03-14",
-      checkedAt: "2026-09-18",
+      checkedAt: "2026-09-19",
       scopeNote: "日連、東日本連盟、県連のトスをコイントスに統一する旨の補助確認。"
     }
   ];
