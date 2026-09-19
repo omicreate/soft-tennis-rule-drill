@@ -287,7 +287,7 @@
           selected
             ? `<section class="answer-card ${isCorrect ? "is-correct" : "is-wrong"}">
                 <strong>${isCorrect ? "正解。ナイスジャッジ！" : "もう一度確認しよう"}</strong>
-                <p><b>${escapeHtml(question.officialTerm)}</b> / ${escapeHtml(question.plainExplanation)}</p>
+                <p><b>${escapeHtml(displayTerm(question))}</b> / ${escapeHtml(question.plainExplanation)}</p>
                 <button class="primary-action" id="nextQuestionButton" type="button">${state.drillIndex >= state.drillSet.length - 1 ? "結果を見る" : "次の問題へ"}</button>
               </section>`
             : `<p class="hint-line">${isFirstVisit ? "10問セットです。選ぶと短い説明が出て、まちがいは振り返りに残ります。" : "選ぶと、正しいことばと短い説明が出ます。"}</p>`
