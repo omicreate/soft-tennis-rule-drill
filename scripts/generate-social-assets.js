@@ -143,7 +143,7 @@ function square(asset) {
     <text x="88" y="510" fill="${colors.muted}" font-size="31" font-weight="800">${esc(asset.note)}</text>
     <rect x="82" y="602" width="916" height="282" rx="44" fill="${colors.white}" stroke="#dcebe4" stroke-width="3"/>
     ${statCard(132, 652, 232, 150, "1セット", "10問", colors.greenDark)}
-    ${statCard(424, 652, 232, 150, "問題数", "150", colors.coral)}
+    ${statCard(424, 652, 232, 150, "問題数", "108", colors.coral)}
     ${statCard(716, 652, 232, 150, "形式", "4択", colors.amber)}
     <text x="86" y="960" fill="${colors.muted}" font-size="29" font-weight="800">スマホ・タブレットで使えます</text>
   `;

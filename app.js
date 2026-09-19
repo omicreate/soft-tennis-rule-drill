@@ -12,6 +12,7 @@
     drillIndex: 0,
     setCorrect: 0,
     setFinished: false,
+    drillCategory: "",
     currentQuestion: null,
     selectedAnswerId: "",
     progress: loadProgress()
@@ -69,6 +70,7 @@
 
   function startDrillSet(category = "") {
     const set = buildDrillSet(category);
+    state.drillCategory = category;
     state.drillSet = set.map((question) => question.id);
     state.drillIndex = 0;
     state.setCorrect = 0;
@@ -172,6 +174,9 @@
       .slice(0, reviewedQuestions().length);
     saveProgress();
     render();
+    requestAnimationFrame(() => {
+      document.querySelector("#nextQuestionButton")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
   }
 
   function categoryStats(questionSet = reviewedQuestions(), answerMap = null) {
@@ -211,14 +216,16 @@
 
   function setActiveTab() {
     navButtons.forEach((button) => {
-      button.classList.toggle("active", button.dataset.tab === state.tab);
+      const active = button.dataset.tab === state.tab;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
     });
   }
 
-  function renderCourtIllustration(question) {
+  function renderCourtIllustration(question, compact = false) {
     const coinMode = question?.category === "2026年コイントス運用";
     return `
-      <div class="drill-visual ${coinMode ? "coin-mode" : ""}" aria-hidden="true">
+      <div class="drill-visual ${coinMode ? "coin-mode" : ""} ${compact ? "is-compact" : ""}" aria-hidden="true">
         <div class="visual-board">
           <span class="visual-chip">4択</span>
           <strong>${coinMode ? "試合前の確認" : "基本ルール"}</strong>
@@ -245,14 +252,20 @@
     const isCorrect = selected && selected === question.answerId;
     const progressText = `${state.drillIndex + 1}/${state.drillSet.length}`;
     const progressRate = ((state.drillIndex + (selected ? 1 : 0)) / state.drillSet.length) * 100;
+    const isFirstVisit = state.progress.totalAnswered === 0 && !selected;
+    const setLabel = state.drillSet.length === 1
+      ? "もう一度"
+      : state.drillCategory
+        ? displayCategoryName(state.drillCategory)
+        : "今日のセット";
     viewRoot.innerHTML = `
       <section class="quiz-panel">
         <div class="quiz-meta">
-          <span>今日のセット</span>
+          <span>${escapeHtml(setLabel)}</span>
           <strong>${escapeHtml(progressText)}</strong>
         </div>
         <div class="progress-track"><span class="${widthClass(progressRate)}"></span></div>
-        ${renderCourtIllustration(question)}
+        ${renderCourtIllustration(question, Boolean(selected))}
         <div class="question-card">
           <p class="question-id">ことば: ${escapeHtml(displayTerm(question))}</p>
           <h2>${escapeHtml(displayPrompt(question))}</h2>
@@ -274,10 +287,10 @@
           selected
             ? `<section class="answer-card ${isCorrect ? "is-correct" : "is-wrong"}">
                 <strong>${isCorrect ? "正解。ナイスジャッジ！" : "もう一度確認しよう"}</strong>
-                <p><b>${escapeHtml(question.officialTerm)}</b> / ${escapeHtml(question.plainExplanation)}</p>
+                <p><b>${escapeHtml(displayTerm(question))}</b> / ${escapeHtml(question.plainExplanation)}</p>
                 <button class="primary-action" id="nextQuestionButton" type="button">${state.drillIndex >= state.drillSet.length - 1 ? "結果を見る" : "次の問題へ"}</button>
               </section>`
-            : `<p class="hint-line">選ぶと、正しいことばと短い説明が出ます。</p>`
+            : `<p class="hint-line">${isFirstVisit ? "10問セットです。選ぶと短い説明が出て、まちがいは振り返りに残ります。" : "選ぶと、正しいことばと短い説明が出ます。"}</p>`
         }
       </section>
     `;
@@ -287,6 +300,10 @@
     viewRoot.innerHTML = `
       <section class="complete-panel">
         <div class="complete-card">
+          <div class="complete-visual" aria-hidden="true">
+            <span class="complete-mark">✓</span>
+            <span class="complete-chip">ルールカード</span>
+          </div>
           <span>1セット完了</span>
           <h2>${state.setCorrect}/${state.drillSet.length} 正解</h2>
           <p>${escapeHtml(setCompleteMessage())}</p>
@@ -314,7 +331,11 @@
           <h2>もう一度やる問題</h2>
           ${
             reviewItems.length
-              ? reviewItems.map((item) => `<button type="button" data-review="${escapeAttr(item.id)}">${escapeHtml(displayTerm(item))}: ${escapeHtml(displayPrompt(item))}</button>`).join("")
+              ? reviewItems.map((item) => `<button type="button" class="review-item" data-review="${escapeAttr(item.id)}">
+                  <span class="review-term">${escapeHtml(displayTerm(item))}</span>
+                  <span class="review-prompt">${escapeHtml(displayPrompt(item))}</span>
+                  <span class="review-action">もう一度</span>
+                </button>`).join("")
               : "<p>まだ復習問題はありません。間違えた問題がここに入ります。</p>"
           }
         </section>
@@ -325,7 +346,7 @@
               (item) => `<button class="category-card" type="button" data-category="${escapeAttr(item.category)}">
                 <span>${escapeHtml(displayCategoryName(item.category))}</span>
                 <strong>${item.correct}/${item.total}</strong>
-                <small>${escapeHtml(displayCategoryHint(item.category))}</small>
+                <small>10問する · ${escapeHtml(displayCategoryHint(item.category))}</small>
               </button>`
             )
             .join("")}
@@ -349,7 +370,7 @@
           <div><span>正答率</span><strong>${accuracy}%</strong></div>
           <div><span>最高連続</span><strong>${state.progress.bestStreak}</strong></div>
         </div>
-        <div class="mini-note">習熟度 ${masteryRate()}% / 最終学習 ${escapeHtml(formatStudyDate(state.progress.lastStudyAt))}</div>
+        <div class="mini-note">習熟度 ${masteryRate()}% / 最終学習 ${escapeHtml(formatStudyDate(state.progress.lastStudyAt))}。記録はこの端末だけに残ります。</div>
         <div class="category-bars">
           ${stats
             .map((item) => `<div class="bar-row">
@@ -418,23 +439,39 @@
     const easyPrompts = {
       "通常ゲームで、先に4ポイントを取り2ポイント差がついた。どうなる？":
         "4ポイントを取って、相手より2ポイント多くなりました。どうなる？",
+      "両方とも3ポイントずつ取った。規則の呼び方は？":
+        "3対3になりました。規則では何と呼ぶ？",
+      "デュースのあと、一方が1ポイント先行した。この呼び方は？":
+        "デュースのあと、片方が1点リードしました。何と呼ぶ？",
+      "アドバンテージの次に、相手が1ポイント取った。どうなる？":
+        "アドバンテージのあと、相手が1点取りました。どうなる？",
       "ファイナルゲームで目安になる先取ポイントは？":
         "ファイナルゲームは、まず何ポイントを目指す？",
-      "ポイントが同点でゲーム終盤に追いついた場面。審判が特に確認したいことは？":
-        "ゲームの終わりごろで同点です。審判は何を確認する？",
-      "7ゲームマッチで勝敗が決まるゲーム取得数は？":
+      "通常のマッチのゲーム数として多いのは？":
+        "ふつうの試合は、何ゲームで行うことが多い？",
+      "7ゲームマッチで、勝敗が決まるゲーム取得数は？":
         "7ゲームマッチは、何ゲーム取ると勝ち？",
-      "5ゲームマッチで勝敗が決まるゲーム取得数は？":
-        "5ゲームマッチは、何ゲーム取ると勝ち？",
-      "得点後に次のサービスへ進む前、主審が確認することは？":
+      "9ゲームマッチで、勝敗が決まるゲーム取得数は？":
+        "9ゲームマッチは、何ゲーム取ると勝ち？",
+      "7ゲームマッチでゲームカウントが3対3。次は？":
+        "7ゲームマッチで3対3です。次はどうなる？",
+      "得点後に次のサービスへ進む前、正審が確認することは？":
         "1点が終わりました。次のサービス前に何を確認する？",
       "サービスがネットに当たって正しいサービスコートに入った。一般的なコールは？":
         "サーブがネットに当たって、正しい場所に入りました。何とコールする？",
-      "第1サービスが正しく入らなかった。次は？":
+      "ファーストサービスが正しく入らなかった。次は？":
         "1本目のサーブが入りませんでした。次はどうする？",
-      "第1サービス、第2サービスとも正しく入らなかった。どうなる？":
+      "ファーストもセカンドも正しく入らなかった。どうなる？":
         "サーブを2本とも失敗しました。どうなる？",
-      "プレー中、別コートのボールが入ってきて危険。主審の対応は？":
+      "サービスのトスとは、どの動作？":
+        "サービスの「トス」は、どの動作？",
+      "ゲーム開始のレシーブは、どのサービスコートから？":
+        "ゲームの最初のレシーブは、右と左のどちらから？",
+      "同じゲームの途中で、レシーブするコートを替えてよい？":
+        "同じゲームの途中で、レシーブする場所を替えてよい？",
+      "有効なサービスは、いつまでに打つ？":
+        "入ったサーブは、何バウンドまでに打つ？",
+      "プレー中、別コートのボールが入ってきて危険。正審の対応は？":
         "プレー中に、となりのコートからボールが入ってきました。どうする？",
       "サービスレットとノーカウントの違いとしてどれ？":
         "「レット」と「ノーカウント」のちがいはどれ？",
@@ -442,54 +479,60 @@
         "審判の声で、選手がプレーを止めてしまいました。どう考える？",
       "サービスがネットに触れ、正しいサービスコートに入らなかった。どうなる？":
         "サーブがネットに当たり、正しい場所に入りませんでした。どうなる？",
-      "隣のコートから声が聞こえたが、プレーに影響していない。毎回ノーカウントにする？":
-        "となりの声が聞こえました。でもプレーには関係なさそうです。毎回やり直す？",
-      "やり直しの判断で大切なことは？":
-        "やり直しにするか迷った時、何を大切にする？",
-      "ノーカウント後の説明としてどれ？":
-        "ノーカウントになったら、どう説明する？",
+      "ノーカウントのあと、基本的に何から再開する？":
+        "ノーカウントのあとは、何からやり直す？",
       "サービスレットのあと、基本的に何をする？":
         "サービスレットのあとは、どうする？",
+      "隣のコートから声が聞こえたが、プレーに影響していない。毎回ノーカウントにする？":
+        "となりの声が聞こえました。でもプレーには関係なさそうです。毎回やり直す？",
+      "インプレー中に順序の誤りに気づいた。選手が自分で止めてよい？":
+        "プレー中に順番のまちがいに気づきました。自分で止めてよい？",
       "打ったボールが相手コートに入らず、ラインの外に落ちた。何とコールする？":
         "打ったボールがラインの外に落ちました。何とコールする？",
       "ボールが地面に2回バウンドしてから返球した。この名前は？":
         "ボールが2回バウンドしてから返しました。この名前は？",
       "プレー中に選手の身体や衣服にボールが触れた。この名前は？":
         "プレー中、ボールが体や服に当たりました。この名前は？",
-      "選手やラケットがプレー中にネットへ触れた。この名前は？":
+      "選手やラケットがプレー中にネットやネットポストへ触れた。この名前は？":
         "プレー中、体やラケットがネットにさわりました。この名前は？",
+      "打球のとき、ボールがラケットに2度以上当たった。この名前は？":
+        "打つとき、ボールがラケットに2回以上当たりました。この名前は？",
+      "打球のとき、ボールがラケットの上で止まった。この名前は？":
+        "打つとき、ボールがラケットの上で止まりました。この名前は？",
+      "打球がフレームに触れて、有効に返せなかった。この名前は？":
+        "フレームに当たって、うまく返せませんでした。この名前は？",
       "相手のプレーを妨げる行為にこの名前は？":
         "相手のプレーをじゃました時の名前は？",
       "ラケットや体がネットを越えて、相手コート側でボールを打った。この名前は？":
         "ネットをこえて、相手側でボールを打ちました。この名前は？",
       "ボールがラインに少しでも触れているように見える。判定としてどれ？":
         "ボールがラインに少しでもさわって見えました。判定は？",
-      "判定を訂正する必要がある時、どうするとよい？":
-        "判定をまちがえたと気づいたら、どうする？",
-      "審判の声が小さい時、どう直す？":
-        "審判の声が小さくて聞こえません。どう直す？",
-      "副審が担当ラインでアウトを確認した。基本の役割は？":
-        "副審がアウトを見ました。副審はどうする？",
-      "判定の声と動作が食い違うとどうなる？":
-        "声と手の合図がちがうと、どうなる？",
-      "試合開始前に主審が確認したいものは？":
-        "試合を始める前、主審は何を確認する？",
-      "ゲームが終わった後、次に気をつけることは？":
-        "ゲームが終わりました。次に何を確認する？",
-      "試合前のトスで決める内容としてどれ？":
-        "試合前のトスでは、何を決める？",
+      "アウトコートで、ノーバウンドのボールをラケットで止めた。この名前は？":
+        "コートの外で、バウンド前のボールをラケットで止めました。この名前は？",
+      "マッチ中、パートナー以外の人から助言を受けてよい？":
+        "試合中、ペア以外の人からアドバイスをもらってよい？",
+      "マッチ中にタイムを取れるのは、どんな時？":
+        "試合中のタイムは、どんな時に取れる？",
+      "タイムの長さの目安として近いのは？":
+        "タイムは、同じ人で何分までが目安？",
+      "同じマッチでタイムを取れる回数の目安は？":
+        "同じ試合で、タイムは何回までが目安？",
+      "マッチの途中で、使えるラケットの本数は？":
+        "試合の途中で、ラケットは何本使ってよい？",
+      "サービスのトスと、試合前のコイントスは同じ？":
+        "サーブのトスと、試合前のコイントスは同じ？",
       "2026年4月7日のJSTA公式案内で導入が示された試合前の方法は？":
         "2026年の案内で、試合前に使うとされた方法は？",
       "JSTA公式案内で、今後コイントスを実施すると示されている大会は？":
         "JSTAの案内では、どの大会でコイントスを行う？",
       "JSTA公式案内で、都道府県連盟へのコイントス運用はどう示されている？":
         "都道府県連盟にも、コイントスをどうしてほしいと案内している？",
+      "2026年の競技規則で、ヒートルールの目安になる暑さ指数（WBGT）は？":
+        "暑い日のヒートルール。暑さ指数はいくつ以上が目安？",
       "ヒートルールが採用されると、ファイナルゲームに入る前に認められる休息は何分間？":
         "暑い日のヒートルール。ファイナルゲーム前の休みは何分？",
-      "ヒートルール採用の目安となる、大会当日の気温は？":
-        "ヒートルールの目安になる気温は？",
-      "気温が測れない時、ヒートルールの目安にする暑さ指数（WBGT）の値は？":
-        "気温が測れない時、WBGTはいくつ以上が目安？"
+      "ヒートルールの休息をとる場所として近いのは？":
+        "ヒートルールの休みは、どこで取る？"
     };
 
     return easyPrompts[normalized] || normalized;
@@ -520,6 +563,7 @@
       "試合進行": "試合の進め方",
       "禁止事項/マナー": "やってはいけないこと",
       "採点票・審判動作": "記録と合図",
+      "スコアシート・審判動作": "記録と合図",
       "2026年コイントス運用": "試合前のトス",
       "ヒートルール": "暑い日のルール"
     };
@@ -536,6 +580,7 @@
       "試合進行": "始め方・進め方",
       "禁止事項/マナー": "安全とフェアプレー",
       "採点票・審判動作": "書き方と手の合図",
+      "スコアシート・審判動作": "書き方と手の合図",
       "2026年コイントス運用": "コイントスの確認",
       "ヒートルール": "暑い日の休み方"
     };
@@ -552,12 +597,24 @@
       "ネットオーバー": "ネットをこえる",
       "審判動作": "審判の合図",
       "採点票": "記録用紙",
+      "スコアシート": "記録用紙",
       "適用大会": "使う大会",
       "順次適用": "少しずつ使う",
       "大会要項": "大会のきまり",
       "公平な進行": "公平に進める",
       "気温基準": "気温の目安",
-      "休息場所": "休む場所"
+      "WBGT": "暑さ指数",
+      "ライトサービスコート": "右側のコート",
+      "ローテーションチェンジ": "順番の直し",
+      "チェンジサイド": "サイドの交代",
+      "ボディタッチ": "体に当たる",
+      "ツーバウンド": "2回バウンド",
+      "ツーバウンズ": "2回バウンド",
+      "暑さ指数": "暑さ指数",
+      "アドバンテージ": "1点リード",
+      "デュースアゲン": "再びデュース",
+      "正審": "主審",
+      "ゲームセット": "試合終了"
     };
     return easyTerms[question.officialTerm] || question.officialTerm;
   }
@@ -565,6 +622,7 @@
   function displayChoiceText(text) {
     const replacements = {
       "そのゲームを取得": "そのゲームの勝ち",
+      "そのゲームの勝ち": "そのゲームの勝ち",
       "もう1ポイント行う": "もう1点行う",
       "ファイナルゲームに入る": "ファイナルゲームへ進む",
       "次の1点で終わるか、差が必要か": "次の1点で終わるか確認",
@@ -575,6 +633,7 @@
       "勘で続ける": "なんとなく続ける",
       "カウント、サーバー、レシーバー": "カウント・サーバー・レシーバー",
       "第2サービスを行う": "2本目のサーブをする",
+      "セカンドサービスを行う": "2本目のサーブをする",
       "ただちに失ポイント": "すぐ相手の点",
       "ダブルフォールトで失ポイント": "ダブルフォールトで相手の点",
       "正しいレシーブ順と位置を確認する": "正しい順番と位置を確認する",
@@ -584,12 +643,14 @@
       "気づいた時点で確認する": "気づいたらすぐ確認する",
       "プレーを止めてノーカウントにする": "止めて、やり直しにする",
       "サービスのやり直しか、ポイント全体のやり直しか": "サーブだけか、ポイント全部か",
+      "そのサービスのやり直しか、ポイント全体のやり直しか": "サーブだけか、ポイント全部か",
       "ノーカウントの可能性": "ノーカウントか確認する",
       "公平性と安全性を保つこと": "公平さと安全を守ること",
       "そのポイントは数えず、状況を戻して再開する": "その点は数えず、戻して再開",
       "該当するサービスをやり直す": "そのサーブをやり直す",
       "イン側として扱う": "インにする",
       "主審へ判定を示して補助する": "主審に判定を知らせる",
+      "正審へ判定を示して補助する": "正審に判定を知らせる",
       "プレーを止める意思を明確にする": "止めることをはっきり伝える",
       "次のサーバーが分かるように進める": "次にだれがサーブか分かるようにする",
       "落ち着いて訂正し、理由を簡潔に示す": "落ち着いて直し、短く説明する",
@@ -598,7 +659,20 @@
       "サービス・レシーブ・サイドの選択": "サーブ・レシーブ・サイド",
       "大会要項・競技上の注意": "大会のきまりや注意",
       "両者に分かるよう公平に行う": "両方に見えるよう公平に行う",
-      "選択内容を確認して試合開始につなげる": "選んだ内容を確認して始める"
+      "選択内容を確認して試合開始につなげる": "選んだ内容を確認して始める",
+      "プレーを止めずに、あとで正しい順へ直す": "止めずに、あとで順番を直す",
+      "正しい順でファーストからやり直す": "正しい順で1本目からやり直す",
+      "手からボールを放すこと": "手からボールを放す",
+      "試合前のコイントス": "試合前のコイン",
+      "原則として受けてはいけない": "基本はもらってはいけない",
+      "正審が認めたけがなどで続けられない時": "けがなどで、正審が認めとき",
+      "同一人1回5分以内": "同じ人で1回5分まで",
+      "同一マッチ2回以内": "同じ試合で2回まで",
+      "常に1本": "ずっと1本",
+      "違う。トスはサーブの動作": "違う。トスはサーブの動作",
+      "そのコート内で、審判の目が届く範囲": "そのコート内で、審判が見える場所",
+      "原則31以上": "31以上が原則",
+      "気温35℃以上": "気温35℃以上"
     };
     return replacements[text] || text;
   }
@@ -664,6 +738,7 @@
         state.drillIndex = 0;
         state.setCorrect = 0;
         state.setFinished = false;
+        state.drillCategory = "";
         state.currentQuestion = normalizeQuestion(question);
         state.selectedAnswerId = "";
         state.tab = "quiz";
