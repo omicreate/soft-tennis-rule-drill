@@ -1,38 +1,20 @@
-const CACHE_NAME = "soft-tennis-rule-drill-v1.0.9";
-const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./styles.css",
-  "./questions.js",
-  "./app.js",
-  "./manifest.webmanifest",
-  "./assets/og-image.png",
-  "./icon.svg",
-  "./icon-maskable.svg",
-  "./icon-192.png",
-  "./icon-512.png",
-  "./icon-maskable-192.png",
-  "./icon-maskable-512.png",
-  "./apple-touch-icon.png",
-  "./favicon-32.png",
-  "./favicon-16.png"
-];
-
-self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
-  self.skipWaiting();
-});
+// ルールドリルは新アプリ「ソフトテニスIQ」へ移転しました（2026-10-02）。
+// 古い版をキャッシュから出し続けないよう、このService Workerは自分のキャッシュを消して登録を解除し、
+// 開いている画面を再読み込みして移転先へ案内します。同じドメインの他アプリのキャッシュには触れません。
+self.addEventListener("install", () => self.skipWaiting());
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter((key) => key.startsWith("soft-tennis-rule-drill-")).map((key) => caches.delete(key)));
+      await self.registration.unregister();
+      const clients = await self.clients.matchAll({ type: "window" });
+      clients.forEach((client) => client.navigate(client.url));
+    })()
   );
-  self.clients.claim();
 });
 
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+self.addEventListener("fetch", () => {
+  // 何もしない（通常どおりネットワークから取得）
 });

@@ -1,4 +1,6 @@
-# ソフテニルールドリル
+# ソフテニルールドリル（移転済み）
+
+> 2026-10-02 に新しいアプリ「ソフトテニスIQ」へ移転しました。今の公開版は https://omicreate.github.io/softtennis-iq/#/drill です。このリポジトリの公開URLは移転先へ転送します。問題データの更新は omicreate/softtennis-iq で行います。
 
 ![ソフテニルールドリル](assets/og-image.png)
 
